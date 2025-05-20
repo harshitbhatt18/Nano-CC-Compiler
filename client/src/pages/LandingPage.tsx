@@ -99,7 +99,7 @@ const LandingPage: React.FC = () => {
             size="large"
             onClick={() => navigate('/compiler')}
             sx={{
-              bgcolor: '#1D3080',
+              bgcolor: '1D3080',
               py: { xs: 1, sm: 1.5 },
               px: { xs: 3, sm: 4 },
               fontSize: { xs: '0.9rem', sm: '1.1rem' },

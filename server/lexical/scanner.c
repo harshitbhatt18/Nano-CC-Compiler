@@ -2611,8 +2611,8 @@ int main(int argc, char *argv[]) {
     outfile = fopen("parseTable", "w");
     
     
-    fprintf(outfile, "%-20s | %-15s | %-15s | %-8s\n", 
-            "Lexeme", "Type", "Attribute", "Line No");
+    /*fprintf(outfile, "%-20s | %-15s | %-15s | %-8s\n", 
+            "Lexeme", "Type", "Attribute", "Line No");*/
     
 
     yylex();
