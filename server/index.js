@@ -19,9 +19,9 @@ app.post('/api/compile', (req, res) => {
     return res.status(400).json({ error: 'No code provided' });
   }
 
-  // Write the code to input.c in the lexical directory
+  // Write the code to input.cc in the lexical directory
   const lexicalDir = path.join(__dirname, 'lexical');
-  const inputFilePath = path.join(lexicalDir, 'input.c');
+  const inputFilePath = path.join(lexicalDir, 'input.cc');
   
   // Ensure the lexical directory exists
   if (!fs.existsSync(lexicalDir)) {
@@ -44,10 +44,19 @@ app.post('/api/compile', (req, res) => {
     let symbolTable = '';
     let constantTable = '';
     
+    const parseTablePath = path.join(lexicalDir, 'parseTable');
     try {
-      parseTable = fs.readFileSync(path.join(lexicalDir, 'parseTable'), 'utf8');
+      if (fs.existsSync(parseTablePath)) {
+        parseTable = fs.readFileSync(parseTablePath, 'utf8');
+        // console.log('Successfully read parseTable.txt. Content:', parseTable);
+        if (!parseTable.trim()) {
+          console.warn('parseTable.txt exists but is empty');
+        }
+      } else {
+        console.error('parseTable.txt does not exist at:', parseTablePath);
+      }
     } catch (err) {
-      console.error('Error reading parseTable:', err);
+      console.error('Error reading parseTable.txt:', err);
     }
     
     try {
@@ -61,6 +70,9 @@ app.post('/api/compile', (req, res) => {
     } catch (err) {
       console.error('Error reading constantTable:', err);
     }
+    
+    // Log the response data before sending
+    // console.log('Sending response with parseTable:', parseTable);
     
     res.json({
       output,

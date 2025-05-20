@@ -46,11 +46,12 @@ const Terminal: React.FC<TerminalProps> = ({ output, onSendInput }) => {
       display: 'flex', 
       flexDirection: 'column', 
       height: '100%', 
-      bgcolor: '#1e1e1e', 
+      bgcolor: 'var(--secondary-color)', 
       color: '#f0f0f0',
       fontFamily: 'monospace',
       p: 1,
-      overflow: 'hidden' // Prevent potential scrollbar jumps
+      overflow: 'hidden',
+      borderRadius: '4px'
     }}>
       <Box 
         ref={outputRef}
@@ -63,7 +64,13 @@ const Terminal: React.FC<TerminalProps> = ({ output, onSendInput }) => {
         }}
       >
         {output || (
-          <Typography variant="body2" color="text.secondary" sx={{ fontStyle: 'italic' }}>
+          <Typography 
+            variant="body2" 
+            sx={{ 
+              fontStyle: 'italic',
+              color: 'var(--accent-color)'
+            }}
+          >
             Output will appear here after compilation...
           </Typography>
         )}
@@ -80,9 +87,20 @@ const Terminal: React.FC<TerminalProps> = ({ output, onSendInput }) => {
         sx={{ 
           mt: 1,
           '& .MuiOutlinedInput-root': {
-            backgroundColor: '#2d2d2d',
+            backgroundColor: 'var(--primary-color)',
             fontFamily: 'monospace',
-            fontSize: '14px'
+            fontSize: '14px',
+            color: 'white',
+            '&:hover fieldset': {
+              borderColor: 'var(--highlight-color)',
+            },
+            '&.Mui-focused fieldset': {
+              borderColor: 'var(--accent-color)',
+            }
+          },
+          '& .MuiOutlinedInput-input::placeholder': {
+            color: 'var(--accent-color)',
+            opacity: 0.7
           }
         }}
       />

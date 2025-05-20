@@ -1,25 +1,28 @@
 {
   "name": "nano-cc-compiler",
   "version": "1.0.0",
-  "description": "A simple C compiler for educational purposes",
+  "description": "A C/C++ compiler with lexical analysis for educational purposes",
   "main": "index.js",
   "scripts": {
     "server": "cd server && npm run dev",
     "client": "cd client && npm start",
     "dev": "concurrently \"npm run server\" \"npm run client\"",
-    "install": "npm install && cd client && npm install && cd ../server && npm install",
+    "install:all": "npm install && cd client && npm install && cd ../server && npm install",
+    "clean": "rimraf server/lexical/.exe server/lexical/.c server/lexical/parseTable.txt server/error.txt server/output.exe",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
     "compiler",
     "c",
-    "lexical",
-    "syntax",
-    "semantic"
+    "cpp",
+    "lexical-analysis",
+    "syntax-analysis",
+    "semantic-analysis"
   ],
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "concurrently": "^8.2.2"
+    "concurrently": "^8.2.2",
+    "rimraf": "^5.0.5"
   }
 }

@@ -17,7 +17,14 @@ export const TabPanel: React.FC<TabPanelProps> = ({ children, value, index, ...o
       {...other}
     >
       {value === index && (
-        <Box>{children}</Box>
+        <Box sx={{
+          bgcolor: 'var(--primary-color)',
+          color: 'white',
+          borderRadius: '4px',
+          p: 2
+        }}>
+          {children}
+        </Box>
       )}
     </div>
   );

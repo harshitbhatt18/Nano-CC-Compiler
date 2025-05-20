@@ -1,370 +1,176 @@
 %{
 #include <stdio.h>
 #include <stdlib.h>
-#include <malloc.h>
 #include <string.h>
-int var=0,i,nc=0,cLine=0,flag=0;
-int lineNumber=1;
-int cBrac=0;
 
-FILE *symbol,*constants,*single,*multi;
-char *comment,*inputFile, s_comment[1000];
+int line_no = 1;
+FILE *outfile;
 
-// Initialize the comment arrays
-void initializeComments() {
-    comment = (char*)malloc(100*sizeof(char));
-    memset(comment, 0, 100*sizeof(char));
-    memset(s_comment, 0, sizeof(s_comment));
+void write_token(const char* lexeme, const char* type, const char* attribute) {
+    fprintf(outfile, "%-20s | %-15s | %-15s | %-8d\n", 
+            lexeme, type, attribute, line_no);
 }
-
-void insertToTable(char *yytext,char type);
-void displayComment(char *yytext);
-void storeSingleLineComment(char *yytext);
-
-struct Node {
-	char *tname;
-	int av;
-	struct Node *next;
-}*head=NULL;
-
 %}
 
-digit  [0-9]
-letter  [a-zA-Z]
-keyword	"auto"|"break"|"case"|"char"|"const"|"continue"|"default"|"do"|"double"|"else"|"enum"|"extern"|"float"|"for"|"goto"|"if"|"int"|"long"|"register"|"return"|"short"|"signed"|"sizeof"|"static"|"struct"|"switch"|"typedef"|"union"|"unsigned"|"void"|"volatile"|"while"
-datatype "int"|"char"|"void"
-sign "signed"|"unsigned"
-modifiers "long"|"short"
-relational >|<|<=|>=|!=|==
-logical \&|\^|\~
-arithmatic \+|\-|\*|\/|\%
-puncuator \(|\)|\[|\]|\;|\,|\:|\.
-assignment =
-quote \'|\"|\\
-whitespace [ \t]+
-newline "\n"
-singlelinecomment (\/\/.*)
-multilinecommentstart (\/\*)
-multilinecommentend (\*\/)
-identifier ({letter}({letter}|{digit})*)|"_"({letter}|{digit})+ 
+%%
+[ \t]           ; /* Skip whitespace */
+\n              { line_no++; }
+"//".*          ; /* Skip single line comments */
+"/*"([^*]|"*"+[^*/])*"*"+"/" ; /* Skip multi-line comments */
 
-%x DETECT_COMMENT
 
+"auto"          { write_token(yytext, "KEYWORD", "AUTO"); } /* C/C++ Keywords */
+"break"         { write_token(yytext, "KEYWORD", "BREAK"); }
+"case"          { write_token(yytext, "KEYWORD", "CASE"); }
+"char"          { write_token(yytext, "KEYWORD", "CHAR"); }
+"const"         { write_token(yytext, "KEYWORD", "CONST"); }
+"continue"      { write_token(yytext, "KEYWORD", "CONTINUE"); }
+"default"       { write_token(yytext, "KEYWORD", "DEFAULT"); }
+"do"            { write_token(yytext, "KEYWORD", "DO"); }
+"double"        { write_token(yytext, "KEYWORD", "DOUBLE"); }
+"else"          { write_token(yytext, "KEYWORD", "ELSE"); }
+"enum"          { write_token(yytext, "KEYWORD", "ENUM"); }
+"extern"        { write_token(yytext, "KEYWORD", "EXTERN"); }
+"float"         { write_token(yytext, "KEYWORD", "FLOAT"); }
+"for"           { write_token(yytext, "KEYWORD", "FOR"); }
+"goto"          { write_token(yytext, "KEYWORD", "GOTO"); }
+"if"            { write_token(yytext, "KEYWORD", "IF"); }
+"int"           { write_token(yytext, "KEYWORD", "INT"); }
+"long"          { write_token(yytext, "KEYWORD", "LONG"); }
+"register"      { write_token(yytext, "KEYWORD", "REGISTER"); }
+"return"        { write_token(yytext, "KEYWORD", "RETURN"); }
+"short"         { write_token(yytext, "KEYWORD", "SHORT"); }
+"signed"        { write_token(yytext, "KEYWORD", "SIGNED"); }
+"sizeof"        { write_token(yytext, "KEYWORD", "SIZEOF"); }
+"static"        { write_token(yytext, "KEYWORD", "STATIC"); }
+"struct"        { write_token(yytext, "KEYWORD", "STRUCT"); }
+"switch"        { write_token(yytext, "KEYWORD", "SWITCH"); }
+"typedef"       { write_token(yytext, "KEYWORD", "TYPEDEF"); }
+"union"         { write_token(yytext, "KEYWORD", "UNION"); }
+"unsigned"      { write_token(yytext, "KEYWORD", "UNSIGNED"); }
+"void"          { write_token(yytext, "KEYWORD", "VOID"); }
+"volatile"      { write_token(yytext, "KEYWORD", "VOLATILE"); }
+"while"         { write_token(yytext, "KEYWORD", "WHILE"); }
+
+
+"class"         { write_token(yytext, "KEYWORD", "CLASS"); } /* C++ Specific Keywords */
+"namespace"     { write_token(yytext, "KEYWORD", "NAMESPACE"); }
+"try"           { write_token(yytext, "KEYWORD", "TRY"); }
+"catch"         { write_token(yytext, "KEYWORD", "CATCH"); }
+"throw"         { write_token(yytext, "KEYWORD", "THROW"); }
+"new"           { write_token(yytext, "KEYWORD", "NEW"); }
+"delete"        { write_token(yytext, "KEYWORD", "DELETE"); }
+"private"       { write_token(yytext, "KEYWORD", "PRIVATE"); }
+"protected"     { write_token(yytext, "KEYWORD", "PROTECTED"); }
+"public"        { write_token(yytext, "KEYWORD", "PUBLIC"); }
+"this"          { write_token(yytext, "KEYWORD", "THIS"); }
+"virtual"       { write_token(yytext, "KEYWORD", "VIRTUAL"); }
+"friend"        { write_token(yytext, "KEYWORD", "FRIEND"); }
+"inline"        { write_token(yytext, "KEYWORD", "INLINE"); }
+"operator"      { write_token(yytext, "KEYWORD", "OPERATOR"); }
+"template"      { write_token(yytext, "KEYWORD", "TEMPLATE"); }
+"typename"      { write_token(yytext, "KEYWORD", "TYPENAME"); }
+"using"         { write_token(yytext, "KEYWORD", "USING"); }
+"bool"          { write_token(yytext, "KEYWORD", "BOOL"); }
+"true"          { write_token(yytext, "KEYWORD", "TRUE"); }
+"false"         { write_token(yytext, "KEYWORD", "FALSE"); }
+"nullptr"       { write_token(yytext, "KEYWORD", "NULLPTR"); }
+
+
+[0-9]+          { write_token(yytext, "NUMBER", "INTEGER"); } /* Numbers */
+[0-9]+\.[0-9]+  { write_token(yytext, "NUMBER", "FLOAT"); }
+0[xX][0-9a-fA-F]+ { write_token(yytext, "NUMBER", "HEX"); }
+
+
+\"([^\\\"]|\\.)*\" { write_token(yytext, "STRING", "LITERAL"); } /* Strings and Characters */
+\'([^\\\']|\\.)\' { write_token(yytext, "CHAR", "LITERAL"); }
+
+
+[a-zA-Z_][a-zA-Z0-9_]* { write_token(yytext, "IDENTIFIER", "VAR"); } /* Identifiers */
+
+
+"+"             { write_token(yytext, "OPERATOR", "ADD"); } /* Operators */
+"-"             { write_token(yytext, "OPERATOR", "SUB"); }
+"*"             { write_token(yytext, "OPERATOR", "MUL"); }
+"/"             { write_token(yytext, "OPERATOR", "DIV"); }
+"%"             { write_token(yytext, "OPERATOR", "MOD"); }
+"++"            { write_token(yytext, "OPERATOR", "INC"); }
+"--"            { write_token(yytext, "OPERATOR", "DEC"); }
+"="             { write_token(yytext, "OPERATOR", "ASSIGN"); }
+"+="            { write_token(yytext, "OPERATOR", "ADD_ASSIGN"); }
+"-="            { write_token(yytext, "OPERATOR", "SUB_ASSIGN"); }
+"*="            { write_token(yytext, "OPERATOR", "MUL_ASSIGN"); }
+"/="            { write_token(yytext, "OPERATOR", "DIV_ASSIGN"); }
+"%="            { write_token(yytext, "OPERATOR", "MOD_ASSIGN"); }
+"=="            { write_token(yytext, "OPERATOR", "EQ"); }
+"!="            { write_token(yytext, "OPERATOR", "NEQ"); }
+"<"             { write_token(yytext, "OPERATOR", "LT"); }
+">"             { write_token(yytext, "OPERATOR", "GT"); }
+"<="            { write_token(yytext, "OPERATOR", "LTE"); }
+">="            { write_token(yytext, "OPERATOR", "GTE"); }
+"&&"            { write_token(yytext, "OPERATOR", "AND"); }
+"||"            { write_token(yytext, "OPERATOR", "OR"); }
+"!"             { write_token(yytext, "OPERATOR", "NOT"); }
+"&"             { write_token(yytext, "OPERATOR", "BIT_AND"); }
+"|"             { write_token(yytext, "OPERATOR", "BIT_OR"); }
+"^"             { write_token(yytext, "OPERATOR", "BIT_XOR"); }
+"~"             { write_token(yytext, "OPERATOR", "BIT_NOT"); }
+"<<"            { write_token(yytext, "OPERATOR", "SHIFT_LEFT"); }
+">>"            { write_token(yytext, "OPERATOR", "SHIFT_RIGHT"); }
+"->"            { write_token(yytext, "OPERATOR", "ARROW"); }
+"::"            { write_token(yytext, "OPERATOR", "SCOPE"); }
+
+
+"("             { write_token(yytext, "PUNCTUATION", "LPAREN"); } /* Punctuation */
+")"             { write_token(yytext, "PUNCTUATION", "RPAREN"); }
+"{"             { write_token(yytext, "PUNCTUATION", "LBRACE"); }
+"}"             { write_token(yytext, "PUNCTUATION", "RBRACE"); }
+"["             { write_token(yytext, "PUNCTUATION", "LBRACKET"); }
+"]"             { write_token(yytext, "PUNCTUATION", "RBRACKET"); }
+";"             { write_token(yytext, "PUNCTUATION", "SEMICOLON"); }
+","             { write_token(yytext, "PUNCTUATION", "COMMA"); }
+"."             { write_token(yytext, "PUNCTUATION", "DOT"); }
+":"             { write_token(yytext, "PUNCTUATION", "COLON"); }
+"?"             { write_token(yytext, "PUNCTUATION", "QUESTION"); }
+
+"#include"      { write_token(yytext, "PREPROCESSOR", "INCLUDE"); } /* Preprocessor Directives */
+"#define"       { write_token(yytext, "PREPROCESSOR", "DEFINE"); }
+"#ifdef"        { write_token(yytext, "PREPROCESSOR", "IFDEF"); }
+"#ifndef"       { write_token(yytext, "PREPROCESSOR", "IFNDEF"); }
+"#endif"        { write_token(yytext, "PREPROCESSOR", "ENDIF"); }
+"#if"           { write_token(yytext, "PREPROCESSOR", "IF"); }
+"#else"         { write_token(yytext, "PREPROCESSOR", "ELSE"); }
+"#elif"         { write_token(yytext, "PREPROCESSOR", "ELIF"); }
+
+.               { write_token(yytext, "ERROR", "INVALID"); }
 %%
 
-^#([-a-zA-Z0-9.]|{relational}|{whitespace})* insertToTable(yytext,'d'); //preprocessor directive rule
-
-{keyword} insertToTable(yytext,'k');
-{sign}?{whitespace}{modifiers}?{whitespace}{datatype} insertToTable(yytext,'k'); //keyword rule
-
-
-^{datatype}{whitespace}*{identifier}\(.*\)  {	int i,j=0;char temp1[50]={'\0'}, temp2[50]={'\0'};
-												for(i=0;yytext[i]!=' ';i++)
-												{
-													temp1[i] = yytext[i];
-												}
-												insertToTable(temp1,'k');
-												
-												for(;yytext[i]!='(';i++){
-													temp2[j]=yytext[i];
-													j++;
-												}
-
-												insertToTable(temp2,'j');  //procedure rule
-											}
-
-{identifier}\[{digit}*\] {	int i,j=0;char temp[50]={'\0'};
-							
-							for(i=0;yytext[i]!='[';i++)
-							{
-								temp[j] = yytext[i];
-								j++;
-							}
-
-								insertToTable(temp,'a'); // array rule
-						}
-
-\*{identifier} {	int i,j=0;char temp[50]={'\0'};
-					for(i=1;yytext[i]!='\0';i++)
-					{
-						temp[j++] = yytext[i];
-					}
-						insertToTable(temp,'q'); // pointer rule
-				}
-				
-{identifier} insertToTable(yytext,'i'); // variable rule
-
-{digit}+({letter}|{digit})+|"_" { printf("%s : %d : Invalid Identifier\n",inputFile,lineNumber); } // invalid identifier
-
-                                        
-{relational} insertToTable(yytext,'r'); //operator rules
-{logical} insertToTable(yytext,'l');
-{arithmatic} insertToTable(yytext,'o');
-{assignment} insertToTable(yytext,'e');
-{puncuator} insertToTable(yytext,'p');
-
-{digit}+ insertToTable(yytext,'c'); //integer constants rule 
-\"(.)*\" insertToTable(yytext,'s'); //string constants rule
-
-L?\"(\\.|[^\\"])*	{
-				if(nc<=0) //invalid String
-				printf("%s : %d : String does not End\n",inputFile,lineNumber);	
-			}
-
-[-+]?{digit}*\.?{digit}+([eE][-+]?{digit}+)? insertToTable(yytext,'f');  // float constant rule
-\'({letter}|{digit})\' {	char temp[50]={'\0'};
-							temp[0] = yytext[1];
-							insertToTable(temp,'z');  // character constant rule
-						}
-
-{quote} ;
-{whitespace} ;
-{newline} lineNumber++;
-
-"{"  { 	cBrac++;
-	insertToTable(yytext,'p');
-	 }
-
-"}"  {	cBrac--;
-	insertToTable(yytext,'p');
-	 }
-
-{singlelinecomment} {
-    storeSingleLineComment(yytext);
-    // Also output to parseTable
-    fprintf(yyout, "\n%s | SingleLineComment | %d | %d", yytext, lineNumber, lineNumber);
-}
-
-{multilinecommentstart}  {  
-                BEGIN(DETECT_COMMENT);
-                nc++;
-                cLine = 1; // Reset the comment line counter
-                displayComment(yytext); // Start capturing the comment
-            }
-
-<DETECT_COMMENT>{multilinecommentstart} { 
-                            nc++;
-                            displayComment(yytext);
-                            if(nc>1)
-                            {
-								printf("%s : %d : Nested Comment\n",inputFile,lineNumber);
-                                flag = 1;
-                            }
-                         }
-
-<DETECT_COMMENT>{multilinecommentend} {
-                            displayComment(yytext);
-                            if(nc>0)
-                                nc--;
-                            else
-			    				printf("%s : %d : */ found before /*\n",inputFile,lineNumber);
-                            
-                            if(nc==0) {
-                                // Output multiline comment to parseTable
-                                fprintf(yyout, "\nMultiLineComment (%d lines): | MultiLineComment | %d | %d", 
-                                        cLine, lineNumber-cLine+1, lineNumber);
-                                BEGIN(INITIAL);
-                            }
-                    }
-
-<DETECT_COMMENT>\n   {  
-                 displayComment(yytext);
-                 cLine++;
-                 lineNumber++;
-                }
-
-<DETECT_COMMENT>. {displayComment(yytext);}
-
-
-%%
-
-int main(int argc,char **argv)
-{
-    initializeComments();
-	yyin=fopen(argv[1],"r");
-	inputFile=argv[1];
-
-	symbol=fopen("symbolTable","w"); //File to write symbol table
-	fprintf(symbol,"\n Symbol Table:\n \t\tLexeme\t\t\t\tType\t\t\tAttribute Value\t\t\tLine Number\n");
-
-	constants=fopen("constantTable","w"); // File to write constant table
-	fprintf(constants,"\n Constants Table:\n \t\tLexeme\t\t\tType\t\t\tAttribute Value\t\t\tLine Number\n");
-
-	yyout=fopen("parseTable","w"); // File to write all token in source program
-	fprintf(yyout,"\nlexme | type | attribute | line no.\n");
-
-	single=fopen("singleComment","w"); 
-	multi=fopen("multiComment","w"); 
-
-	yylex();
-	
-    	if(nc!=0)
-    		printf("%s : %d : Comment Does Not End\n",inputFile,lineNumber);
-    		
-    	if(cBrac!=0)
-    		printf("%s : %d : Unbalanced Parenthesis\n",inputFile,lineNumber);
-    
-    	fprintf(yyout,"\n");
-    	if(flag==1)
-    	{
-			cLine = 0;
-			fprintf(single,"Comment (%d lines):\n",cLine);
-			printf("%s : %d : Nested Comment\n",inputFile,lineNumber);
-    	}
-    	else
-    	{
-	    	int i;
-			fprintf(multi,"MultiLineComment (%d lines):\n",cLine);
-			fprintf(multi,"%s", comment);
-			
-			fprintf(single,"\n\nSingleLineComment :\n");
-			fprintf(single,"%s", s_comment);
-	   	}
-    
-	fclose(yyout);
-	fclose(symbol);
-	fclose(constants);
-	fclose(single);
-	fclose(multi);
-	
-	return 0;
-}
-
-void storeSingleLineComment(char *yytext)
-{
-	int len = strlen(yytext);
-	int i, j=0;
-	char *temp;
-	temp = (char*)malloc((len+1)*sizeof(char));
-	for(i=2;yytext[i]!='\0';i++)
-	{
-		temp[j++] = yytext[i];
-	}
-	temp[j] = '\0';
-	strcat(temp,"\n");
-	strcat(s_comment,temp);
-	free(temp);
-}
-
-void displayComment(char *yytext)
-{
-    int l1, l2;
-    char *temp;
-
-    l1 = strlen(comment);
-    l2 = strlen(yytext);
-    temp = (char*)malloc((l1+l2+1)*sizeof(char));
-    strcpy(temp,comment);
-    strcat(temp,yytext);
-    
-    // Reallocate comment buffer if needed
-    if (l1+l2+1 > 100) {
-        free(comment);
-        comment = (char*)malloc((l1+l2+1)*sizeof(char));
-    }
-    
-    strcpy(comment,temp);
-    free(temp);
-}
-
-void insertToTable(char *yytext,char type)
-{
-    int l1 = strlen(yytext), i;
-    
-    char token[30];
-    struct Node *current = NULL, *temp = NULL;
-
-    switch(type)
-    {
-		case 'd': strcpy(token,"Preprocessor Statement");break;
-
-        case 'k': strcpy(token,"Keyword");break;
-         
-        case 'j': strcpy(token,"Procedure");break;              
-       
-        case 'a': strcpy(token,"Array");break;
-
-		case 'q' : strcpy(token,"Pointer");break;
-        
-        case 'i': strcpy(token,"Identifier");break;
-	 	
-		case 'r': strcpy(token,"Relational Op");break;
-
-        case 'p': strcpy(token,"Punctuator");break;
-       	
-       	case 'o': strcpy(token,"Arithmetic Op");break;   
-        
-        case 'c': strcpy(token,"Integer Constant");break;
-
-        case 'f': strcpy(token,"Float Constant");break;
-
-        case 'z': strcpy(token,"Character Constant");break;                                
-      	
-      	case 'e': strcpy(token,"Assignment Op");break;
-      	
-      	case 'l': strcpy(token,"Logical Op");break;	
-    	
-    	case 's': strcpy(token,"String Literal");break;
+int main(int argc, char *argv[]) {
+    if (argc != 2) {
+        printf("Usage: %s <input_file>\n", argv[0]);
+        return 1;
     }
 
-    if(nc<=0)
-    {
-	    current = head;
-	    for(i=0;i<var;i++)
-	    {    	
-	    	if(strcmp(current->tname,yytext)==0)
-	    		{
-	    			break;
-	    		}
-	    		current = current->next;
-	    }
-
-	    if(i==var)
-	    {    	
-	    	temp = (struct Node *)malloc(sizeof(struct Node));
-	    	temp->av = i;
-	    	temp->tname = (char *)malloc(sizeof(char)*(l1+1));
-	    	strcpy(temp->tname,yytext);
-	    	temp->next = NULL;
-
-	    	if(head==NULL)
-	    	{    		
-	    		head = temp;
-	    	}
-	    	else
-	    	{
-	    		current = head;
-	    		while(current->next!=NULL)
-	    		{
-	    			current = current->next;
-	    		}    
-		    	current->next = temp;
-		}
-		   	
-    		var++;	
-	    }
+    yyin = fopen(argv[1], "r");
+    if (!yyin) {
+        printf("Cannot open input file %s\n", argv[1]);
+        return 1;
     }
 
-	if(type =='i' || type == 'a' || type == 'q' || type=='j')
-	{	
-		fprintf(symbol,"\n%s | %s | %d | %d",yytext,token,i,lineNumber);
-	}
-	switch(type)
-	{		
-		case 'c' : fprintf(constants,"\n%s | %s | %d | %d",yytext,"int",i,lineNumber);
-				    break;
+    outfile = fopen("parseTable", "w");
+    
+    
+    fprintf(outfile, "%-20s | %-15s | %-15s | %-8s\n", 
+            "Lexeme", "Type", "Attribute", "Line No");
+    
 
-		case 'f' : fprintf(constants,"\n%s | %s | %d | %d",yytext,"float",i,lineNumber);
-				    break;
+    yylex();
 
-		case 'z' : fprintf(constants,"\n%s | %s | %d | %d",yytext,"char",i,lineNumber);
-				    break;
-	}
-
-   	fprintf(yyout,"\n%s | %s | %d | %d",yytext,token,i,lineNumber);
+    fclose(yyin);
+    fclose(outfile);
+    return 0;
 }
-                                                                                                    
-int yywrap()
-{
- return(1);
-}
+
+int yywrap() {
+    return 1;
+} 

@@ -1,25 +1,3 @@
-
- Symbol Table:
- 		Lexeme				Type			Attribute Value			Line Number
-
- main | Procedure | 2 | 2
-node | Identifier | 5 | 9
-a | Identifier | 6 | 10
-name | Identifier | 9 | 11
-fl | Identifier | 12 | 14
-l1 | Identifier | 15 | 15
-l2 | Identifier | 17 | 15
-a | Identifier | 6 | 16
-b | Identifier | 20 | 16
-c | Identifier | 21 | 16
-arr | Array | 23 | 17
-ptr | Pointer | 24 | 18
-sum | Identifier | 25 | 20
-sum | Identifier | 25 | 21
-a | Identifier | 6 | 21
-b | Identifier | 20 | 21
-printf | Identifier | 27 | 22
-sum | Identifier | 25 | 22
-name | Pointer | 9 | 25
- abc | Procedure | 34 | 33
-printf | Identifier | 27 | 35
+NAME    TYPE    SCOPE    VALUE 
+test    int     global   0 
+value   int     global   0 

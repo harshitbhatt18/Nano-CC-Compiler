@@ -1,5 +1,14 @@
+:root {
+  --primary-color: #265077;
+  --secondary-color: #022140;
+  --accent-color: #494B68;
+  --text-color: #1E4258;
+  --highlight-color: #2D5F5D;
+}
+
 .App {
   text-align: center;
+  color: var(--text-color);
 }
 
 .App-logo {
@@ -14,7 +23,7 @@
 }
 
 .App-header {
-  background-color: #282c34;
+  background-color: var(--primary-color);
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -25,7 +34,20 @@
 }
 
 .App-link {
-  color: #61dafb;
+  color: var(--highlight-color);
+}
+
+button {
+  background-color: var(--secondary-color);
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: var(--accent-color);
 }
 
 @keyframes App-logo-spin {

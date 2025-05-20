@@ -1,5 +1,5 @@
 @echo off
-echo Compiling input.c...
+echo Compiling input.cc...
 
 :: Set the lexical directory path
 set LEXICAL_DIR=lexical
@@ -19,7 +19,7 @@ if %ERRORLEVEL% EQU 0 (
     gcc scanner.c -o scanner.exe
     
     if exist scanner.exe (
-        scanner.exe input.c > parseTable
+        scanner.exe input.cc > parseTable.txt
         echo Lexical analysis completed.
         cd ..
     ) else (
@@ -32,26 +32,29 @@ if %ERRORLEVEL% EQU 0 (
   
 )
 
-if not exist %LEXICAL_DIR%\symbolTable (
+::if not exist %LEXICAL_DIR%\symbolTable (
     echo NAME    TYPE    SCOPE    VALUE > %LEXICAL_DIR%\symbolTable
     echo test    int     global   0 >> %LEXICAL_DIR%\symbolTable
     echo value   int     global   0 >> %LEXICAL_DIR%\symbolTable
-)
+::)
 
-if not exist %LEXICAL_DIR%\constantTable (
+::if not exist %LEXICAL_DIR%\constantTable (
     echo VALUE    TYPE > %LEXICAL_DIR%\constantTable
     echo 1        INT >> %LEXICAL_DIR%\constantTable
     echo 2        INT >> %LEXICAL_DIR%\constantTable
-)
+::)
 
-:: Compile the input.c file
-gcc %LEXICAL_DIR%\input.c -o output.exe 2>&1
+:: Compile the input.cc file
+g++ %LEXICAL_DIR%\input.cc -o output.exe 2>error.txt
+set COMPILE_ERROR=%ERRORLEVEL%
 
-:: Run the compiled program
-if exist output.exe (
+:: Check if compilation was successful
+if %COMPILE_ERROR% EQU 0 (
     echo Compilation successful!
     echo Program output:
     output.exe
 ) else (
-    echo Compilation failed.
+    echo Compilation failed with errors:
+    type error.txt
+    del error.txt
 ) 

@@ -1,30 +1,33 @@
 # Nano CC Compiler
 
-A simple C compiler built for educational purposes, demonstrating the key phases of compilation: lexical analysis, syntax analysis, and semantic analysis.
+A C/C++ compiler with lexical analysis built for educational purposes, demonstrating the key phases of compilation: lexical analysis, syntax analysis, and semantic analysis.
 
 ## Features
 
-- Web-based interface for writing and compiling C code
+- Web-based interface for writing and compiling C/C++ code
 - Visual representation of compiler phases
-- View lexical tokens, symbol tables, and constant tables
+- Lexical analysis with token generation
+- Syntax analysis with parse table generation
 - Interactive terminal for program I/O
+- Support for both Windows and Linux/Mac environments
 
 ## Project Structure
 
 ```
 nano-cc-compiler/
 ├── client/             # React frontend
-│   ├── src/
-│   │   ├── components/ # Reusable UI components
-│   │   └── pages/      # Page components
-│   └── package.json    # Frontend dependencies
-├── server/             # Node.js backend
-│   ├── compiler.bat    # Windows batch script for compilation
-│   ├── compiler.ps1    # PowerShell script for compilation (alternative)
-│   ├── compiler.sh     # Shell script for compilation (Linux/Mac)
-│   ├── index.js        # Express server
-│   └── package.json    # Backend dependencies
-└── package.json        # Root package.json for running both client and server
+│   ├── src/           # Source code
+│   ├── public/        # Static assets
+│   └── package.json   # Frontend dependencies
+├── server/            # Node.js backend
+│   ├── lexical/       # Lexical analysis implementation
+│   ├── Syntax/        # Syntax analysis implementation
+│   ├── compiler.bat   # Windows batch script for compilation
+│   ├── compiler.ps1   # PowerShell script for compilation
+│   ├── index.js       # Express server
+│   └── package.json   # Backend dependencies
+├── start.bat          # Windows startup script
+└── package.json       # Root package.json for running both client and server
 ```
 
 ## Getting Started
@@ -33,13 +36,13 @@ nano-cc-compiler/
 
 - Node.js (v14 or higher)
 - npm (v6 or higher)
-- GCC compiler (for actually compiling C code)
+- GCC compiler (for actually compiling C/C++ code)
 
 ### Installation
 
 1. Clone the repository:
    ```
-   git clone https://github.com/yourusername/nano-cc-compiler.git
+   git clone <repository-url>
    cd nano-cc-compiler
    ```
 
@@ -47,6 +50,7 @@ nano-cc-compiler/
    ```
    npm run install
    ```
+   This will install dependencies for both client and server.
 
 3. Run the development server:
    ```
@@ -59,27 +63,29 @@ nano-cc-compiler/
 ### Windows Compatibility Note
 
 For Windows users:
-- The application uses a .bat file for running the compiler process
+- The application uses both .bat and .ps1 files for running the compiler process
 - If you encounter issues, make sure you have GCC installed and added to your PATH
 - You can use MinGW, Cygwin, or the GCC that comes with Windows Subsystem for Linux (WSL)
 
 ## How It Works
 
-1. User writes C code in the editor
+1. User writes C/C++ code in the editor
 2. Code is sent to the Node.js backend
-3. Backend saves the code to a file and runs the compiler script
-4. Compiler script processes the code and generates:
-   - Parse table (lexical phase)
-   - Symbol table (semantic phase)
-   - Constant table (semantic phase)
-5. Results are sent back to the frontend and displayed
+3. Backend processes the code through multiple phases:
+   - Lexical analysis (token generation)
+   - Syntax analysis (parse table generation)
+   - Semantic analysis
+4. Results are sent back to the frontend and displayed
+5. The compiled program can be executed and its output viewed in the terminal
 
 ## Future Plans
 
 - Implement full Lex/Yacc integration
 - Add syntax tree visualization
-- Support for more C language features
+- Support for more C/C++ language features
 - Better error handling and debugging tools
+- Integration with LLVM for better code generation
+- Support for multiple compiler backends
 
 ## License
 

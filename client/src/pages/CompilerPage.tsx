@@ -1,9 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Box, AppBar, Toolbar, Typography, Button, Tab, Tabs, Paper } from '@mui/material';
 import Editor from '@monaco-editor/react';
 import axios from 'axios';
 import Terminal from '../components/Terminal';
 import { TabPanel } from '../components/TabPanel';
+import Navbar from '../components/Navbar';
+
 
 const CompilerPage: React.FC = () => {
   const [code, setCode] = useState(`#include <stdio.h>\n\nint main() {\n    printf("Hello, World!\\n");\n    return 0;\n}`);
@@ -16,6 +18,7 @@ const CompilerPage: React.FC = () => {
   const [editorHeight, setEditorHeight] = useState('60%');
   const [terminalHeight, setTerminalHeight] = useState('35%');
   const [formattedParseTable, setFormattedParseTable] = useState('');
+  const [compilationId, setCompilationId] = useState<string | null>(null);
 
   // Set stable heights on initial load
   useEffect(() => {
@@ -124,6 +127,7 @@ const CompilerPage: React.FC = () => {
     
     try {
       const response = await axios.post('http://localhost:5000/api/compile', { code });
+      setCompilationId(response.data.compilationId || null);
       setOutput(response.data.output + (response.data.error ? '\n' + response.data.error : ''));
       setParseTable(response.data.parseTable || 'No parse table data available');
       setSymbolTable(response.data.symbolTable || 'No symbol table data available');
@@ -133,6 +137,22 @@ const CompilerPage: React.FC = () => {
       setOutput('Error: Failed to communicate with the server.');
     } finally {
       setCompiling(false);
+      setCompilationId(null);
+    }
+  };
+
+  const handleTerminateCompilation = async () => {
+    if (compilationId) {
+      try {
+        await axios.post('http://localhost:5000/api/terminate', { compilationId });
+        setOutput(prev => prev + '\n\nCompilation terminated by user.');
+      } catch (error) {
+        console.error('Error terminating compilation:', error);
+        setOutput(prev => prev + '\n\nFailed to terminate compilation.');
+      } finally {
+        setCompiling(false);
+        setCompilationId(null);
+      }
     }
   };
 
@@ -152,13 +172,7 @@ const CompilerPage: React.FC = () => {
 
   return (
     <Box sx={{ flexGrow: 1, height: '100vh', display: 'flex', flexDirection: 'column', overflow: 'hidden', bgcolor: '#121212' }}>
-      <AppBar position="static" sx={{ bgcolor: '#1a1a1a', boxShadow: '0 1px 3px rgba(0,0,0,0.5)' }}>
-        <Toolbar>
-          <Typography variant="h6" component="div" sx={{ flexGrow: 1, cursor: 'pointer', color: '#e0e0e0' }} onClick={handleTitleClick}>
-            Nano CC Compiler
-          </Typography>
-        </Toolbar>
-      </AppBar>
+      <Navbar />
       
       <Box sx={{ display: 'flex', flexGrow: 1, overflow: 'hidden', bgcolor: '#121212' }}>
         {/* Left side: Editor + Terminal */}
@@ -199,24 +213,27 @@ const CompilerPage: React.FC = () => {
                 theme: 'vs-dark'
               }}
             />
-            <Button 
-              variant="contained" 
-              sx={{ 
-                position: 'absolute', 
-                top: 10, 
-                right: 10, 
-                zIndex: 10,
-                bgcolor: '#bb86fc',
-                color: '#000',
-                '&:hover': {
-                  bgcolor: '#9d65df'
-                }
-              }}
-              onClick={handleCompile}
-              disabled={compiling}
-            >
-              Compile
-            </Button>
+            <Box sx={{ position: 'absolute', top: 8, right: 8, display: 'flex', gap: 2 }}>
+              {compiling ? (
+                <Button 
+                  variant="contained" 
+                  color="error"
+                  onClick={handleTerminateCompilation}
+                  sx={{ borderRadius: 1, textTransform: 'none' }}
+                >
+                  Terminate
+                </Button>
+              ) : (
+                <Button 
+                  variant="contained" 
+                  color="primary"
+                  onClick={handleCompile}
+                  sx={{ borderRadius: 1, textTransform: 'none' }}
+                >
+                  Compile & Run
+                </Button>
+              )}
+            </Box>
           </Paper>
           
           <Paper 

@@ -1,6 +1,0 @@
-
-
-SingleLineComment :
- scanf("%d %d",&a,&b);
-Enter Name
-End the main function
