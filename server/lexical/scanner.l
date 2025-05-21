@@ -6,7 +6,7 @@
 int line_no = 1;
 FILE *outfile;
 
-void write_token(const char* lexeme, const char* type, const char* attribute) {
+void write_token(char* lexeme, char* type, char* attribute) {
     fprintf(outfile, "%-20s | %-15s | %-15s | %-8d\n", 
             lexeme, type, attribute, line_no);
 }
@@ -16,7 +16,8 @@ void write_token(const char* lexeme, const char* type, const char* attribute) {
 [ \t]           ; /* Skip whitespace */
 \n              { line_no++; }
 "//".*          ; /* Skip single line comments */
-"/*"([^*]|"*"+[^*/])*"*"+"/" ; /* Skip multi-line comments */
+\/\*([^*]|\*+[^*/])*\*+\/ ; /* Skip multi-line comments */
+
 
 
 "auto"          { write_token(yytext, "KEYWORD", "AUTO"); } /* C/C++ Keywords */

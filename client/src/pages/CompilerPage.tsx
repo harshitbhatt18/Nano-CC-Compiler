@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Box, AppBar, Toolbar, Typography, Button, Tab, Tabs, Paper } from '@mui/material';
+import React, { useState, useEffect} from 'react';
+import { Box, Typography, Button, Tab, Tabs, Paper } from '@mui/material';
 import Editor from '@monaco-editor/react';
 import axios from 'axios';
 import Terminal from '../components/Terminal';
@@ -42,19 +42,11 @@ const CompilerPage: React.FC = () => {
     try {
       // Create CSS for table layout
       let result = '<style>\n';
-      result += ':root {\n';
-      result += '  --bg-dark: #121212;\n';
-      result += '  --bg-surface: #1e1e1e;\n';
-      result += '  --border-color: #333333;\n';
-      result += '  --accent-color: #bb86fc;\n';
-      result += '  --text-primary: #e0e0e0;\n';
-      result += '  --text-secondary: #a0a0a0;\n';
-      result += '}\n';
-      result += '.parse-table { width: 100%; border-collapse: collapse; font-family: sans-serif; color: var(--text-primary); }\n';
-      result += '.parse-table th { padding: 8px; text-align: left; background-color: #2d2d2d; color: var(--accent-color); border: 1px solid var(--border-color); }\n';
+      result += '.parse-table { width: 100%; border-collapse: collapse; font-family: sans-serif; }\n';
+      result += '.parse-table th { padding: 8px; text-align: left; background-color: #2d2d2d; color:  #bb86fc; }\n';
       result += '.parse-table tr:nth-child(odd) td { background-color: #242424; }\n';
       result += '.parse-table tr:nth-child(even) td { background-color: #1e1e1e; }\n';
-      result += '.parse-table td { padding: 8px; border: 1px solid var(--border-color); vertical-align: top; }\n';
+      result += '.parse-table td { padding: 8px; vertical-align: top; }\n';
       result += '</style>\n';
       
       // Start table
@@ -79,7 +71,7 @@ const CompilerPage: React.FC = () => {
         
         // Parse the line
         const parts = line.split(' | ');
-        if (parts.length >= 4) {
+        if (parts.length == 4) {
           const lexeme = parts[0].trim();
           const type = parts[1].trim();
           const attribute = parts[2].trim();
@@ -160,15 +152,12 @@ const CompilerPage: React.FC = () => {
     setTabValue(newValue);
   };
 
+  // // This is a placeholder for sending input to the running process
   const handleSendInput = (input: string) => {
-    // This is a placeholder for sending input to the running process
     axios.post('http://localhost:5000/api/input', { input })
       .catch(error => console.error('Error sending input:', error));
   };
 
-  const handleTitleClick = () => {
-    window.location.reload();
-  };
 
   return (
     <Box sx={{ flexGrow: 1, height: '100vh', display: 'flex', flexDirection: 'column', overflow: 'hidden', bgcolor: '#121212' }}>
@@ -209,7 +198,7 @@ const CompilerPage: React.FC = () => {
                 lineNumbers: 'on',
                 scrollBeyondLastLine: false,
                 fontSize: 14,
-                automaticLayout: true, // Important for resize handling
+                automaticLayout: true, 
                 theme: 'vs-dark'
               }}
             />

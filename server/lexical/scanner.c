@@ -732,7 +732,7 @@ char *yytext;
 int line_no = 1;
 FILE *outfile;
 
-void write_token(const char* lexeme, const char* type, const char* attribute) {
+void write_token(char* lexeme, char* type, char* attribute) {
     fprintf(outfile, "%-20s | %-15s | %-15s | %-8d\n", 
             lexeme, type, attribute, line_no);
 }
@@ -1037,559 +1037,559 @@ YY_RULE_SETUP
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 22 "scanner.l"
+#line 23 "scanner.l"
 { write_token(yytext, "KEYWORD", "AUTO"); } /* C/C++ Keywords */
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 23 "scanner.l"
+#line 24 "scanner.l"
 { write_token(yytext, "KEYWORD", "BREAK"); }
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 24 "scanner.l"
+#line 25 "scanner.l"
 { write_token(yytext, "KEYWORD", "CASE"); }
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 25 "scanner.l"
+#line 26 "scanner.l"
 { write_token(yytext, "KEYWORD", "CHAR"); }
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 26 "scanner.l"
+#line 27 "scanner.l"
 { write_token(yytext, "KEYWORD", "CONST"); }
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 27 "scanner.l"
+#line 28 "scanner.l"
 { write_token(yytext, "KEYWORD", "CONTINUE"); }
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 28 "scanner.l"
+#line 29 "scanner.l"
 { write_token(yytext, "KEYWORD", "DEFAULT"); }
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 29 "scanner.l"
+#line 30 "scanner.l"
 { write_token(yytext, "KEYWORD", "DO"); }
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 30 "scanner.l"
+#line 31 "scanner.l"
 { write_token(yytext, "KEYWORD", "DOUBLE"); }
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 31 "scanner.l"
+#line 32 "scanner.l"
 { write_token(yytext, "KEYWORD", "ELSE"); }
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 32 "scanner.l"
+#line 33 "scanner.l"
 { write_token(yytext, "KEYWORD", "ENUM"); }
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 33 "scanner.l"
+#line 34 "scanner.l"
 { write_token(yytext, "KEYWORD", "EXTERN"); }
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 34 "scanner.l"
+#line 35 "scanner.l"
 { write_token(yytext, "KEYWORD", "FLOAT"); }
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 35 "scanner.l"
+#line 36 "scanner.l"
 { write_token(yytext, "KEYWORD", "FOR"); }
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 36 "scanner.l"
+#line 37 "scanner.l"
 { write_token(yytext, "KEYWORD", "GOTO"); }
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 37 "scanner.l"
+#line 38 "scanner.l"
 { write_token(yytext, "KEYWORD", "IF"); }
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
-#line 38 "scanner.l"
+#line 39 "scanner.l"
 { write_token(yytext, "KEYWORD", "INT"); }
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
-#line 39 "scanner.l"
+#line 40 "scanner.l"
 { write_token(yytext, "KEYWORD", "LONG"); }
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
-#line 40 "scanner.l"
+#line 41 "scanner.l"
 { write_token(yytext, "KEYWORD", "REGISTER"); }
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
-#line 41 "scanner.l"
+#line 42 "scanner.l"
 { write_token(yytext, "KEYWORD", "RETURN"); }
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
-#line 42 "scanner.l"
+#line 43 "scanner.l"
 { write_token(yytext, "KEYWORD", "SHORT"); }
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
-#line 43 "scanner.l"
+#line 44 "scanner.l"
 { write_token(yytext, "KEYWORD", "SIGNED"); }
 	YY_BREAK
 case 27:
 YY_RULE_SETUP
-#line 44 "scanner.l"
+#line 45 "scanner.l"
 { write_token(yytext, "KEYWORD", "SIZEOF"); }
 	YY_BREAK
 case 28:
 YY_RULE_SETUP
-#line 45 "scanner.l"
+#line 46 "scanner.l"
 { write_token(yytext, "KEYWORD", "STATIC"); }
 	YY_BREAK
 case 29:
 YY_RULE_SETUP
-#line 46 "scanner.l"
+#line 47 "scanner.l"
 { write_token(yytext, "KEYWORD", "STRUCT"); }
 	YY_BREAK
 case 30:
 YY_RULE_SETUP
-#line 47 "scanner.l"
+#line 48 "scanner.l"
 { write_token(yytext, "KEYWORD", "SWITCH"); }
 	YY_BREAK
 case 31:
 YY_RULE_SETUP
-#line 48 "scanner.l"
+#line 49 "scanner.l"
 { write_token(yytext, "KEYWORD", "TYPEDEF"); }
 	YY_BREAK
 case 32:
 YY_RULE_SETUP
-#line 49 "scanner.l"
+#line 50 "scanner.l"
 { write_token(yytext, "KEYWORD", "UNION"); }
 	YY_BREAK
 case 33:
 YY_RULE_SETUP
-#line 50 "scanner.l"
+#line 51 "scanner.l"
 { write_token(yytext, "KEYWORD", "UNSIGNED"); }
 	YY_BREAK
 case 34:
 YY_RULE_SETUP
-#line 51 "scanner.l"
+#line 52 "scanner.l"
 { write_token(yytext, "KEYWORD", "VOID"); }
 	YY_BREAK
 case 35:
 YY_RULE_SETUP
-#line 52 "scanner.l"
+#line 53 "scanner.l"
 { write_token(yytext, "KEYWORD", "VOLATILE"); }
 	YY_BREAK
 case 36:
 YY_RULE_SETUP
-#line 53 "scanner.l"
+#line 54 "scanner.l"
 { write_token(yytext, "KEYWORD", "WHILE"); }
 	YY_BREAK
 case 37:
 YY_RULE_SETUP
-#line 56 "scanner.l"
+#line 57 "scanner.l"
 { write_token(yytext, "KEYWORD", "CLASS"); } /* C++ Specific Keywords */
 	YY_BREAK
 case 38:
 YY_RULE_SETUP
-#line 57 "scanner.l"
+#line 58 "scanner.l"
 { write_token(yytext, "KEYWORD", "NAMESPACE"); }
 	YY_BREAK
 case 39:
 YY_RULE_SETUP
-#line 58 "scanner.l"
+#line 59 "scanner.l"
 { write_token(yytext, "KEYWORD", "TRY"); }
 	YY_BREAK
 case 40:
 YY_RULE_SETUP
-#line 59 "scanner.l"
+#line 60 "scanner.l"
 { write_token(yytext, "KEYWORD", "CATCH"); }
 	YY_BREAK
 case 41:
 YY_RULE_SETUP
-#line 60 "scanner.l"
+#line 61 "scanner.l"
 { write_token(yytext, "KEYWORD", "THROW"); }
 	YY_BREAK
 case 42:
 YY_RULE_SETUP
-#line 61 "scanner.l"
+#line 62 "scanner.l"
 { write_token(yytext, "KEYWORD", "NEW"); }
 	YY_BREAK
 case 43:
 YY_RULE_SETUP
-#line 62 "scanner.l"
+#line 63 "scanner.l"
 { write_token(yytext, "KEYWORD", "DELETE"); }
 	YY_BREAK
 case 44:
 YY_RULE_SETUP
-#line 63 "scanner.l"
+#line 64 "scanner.l"
 { write_token(yytext, "KEYWORD", "PRIVATE"); }
 	YY_BREAK
 case 45:
 YY_RULE_SETUP
-#line 64 "scanner.l"
+#line 65 "scanner.l"
 { write_token(yytext, "KEYWORD", "PROTECTED"); }
 	YY_BREAK
 case 46:
 YY_RULE_SETUP
-#line 65 "scanner.l"
+#line 66 "scanner.l"
 { write_token(yytext, "KEYWORD", "PUBLIC"); }
 	YY_BREAK
 case 47:
 YY_RULE_SETUP
-#line 66 "scanner.l"
+#line 67 "scanner.l"
 { write_token(yytext, "KEYWORD", "THIS"); }
 	YY_BREAK
 case 48:
 YY_RULE_SETUP
-#line 67 "scanner.l"
+#line 68 "scanner.l"
 { write_token(yytext, "KEYWORD", "VIRTUAL"); }
 	YY_BREAK
 case 49:
 YY_RULE_SETUP
-#line 68 "scanner.l"
+#line 69 "scanner.l"
 { write_token(yytext, "KEYWORD", "FRIEND"); }
 	YY_BREAK
 case 50:
 YY_RULE_SETUP
-#line 69 "scanner.l"
+#line 70 "scanner.l"
 { write_token(yytext, "KEYWORD", "INLINE"); }
 	YY_BREAK
 case 51:
 YY_RULE_SETUP
-#line 70 "scanner.l"
+#line 71 "scanner.l"
 { write_token(yytext, "KEYWORD", "OPERATOR"); }
 	YY_BREAK
 case 52:
 YY_RULE_SETUP
-#line 71 "scanner.l"
+#line 72 "scanner.l"
 { write_token(yytext, "KEYWORD", "TEMPLATE"); }
 	YY_BREAK
 case 53:
 YY_RULE_SETUP
-#line 72 "scanner.l"
+#line 73 "scanner.l"
 { write_token(yytext, "KEYWORD", "TYPENAME"); }
 	YY_BREAK
 case 54:
 YY_RULE_SETUP
-#line 73 "scanner.l"
+#line 74 "scanner.l"
 { write_token(yytext, "KEYWORD", "USING"); }
 	YY_BREAK
 case 55:
 YY_RULE_SETUP
-#line 74 "scanner.l"
+#line 75 "scanner.l"
 { write_token(yytext, "KEYWORD", "BOOL"); }
 	YY_BREAK
 case 56:
 YY_RULE_SETUP
-#line 75 "scanner.l"
+#line 76 "scanner.l"
 { write_token(yytext, "KEYWORD", "TRUE"); }
 	YY_BREAK
 case 57:
 YY_RULE_SETUP
-#line 76 "scanner.l"
+#line 77 "scanner.l"
 { write_token(yytext, "KEYWORD", "FALSE"); }
 	YY_BREAK
 case 58:
 YY_RULE_SETUP
-#line 77 "scanner.l"
+#line 78 "scanner.l"
 { write_token(yytext, "KEYWORD", "NULLPTR"); }
 	YY_BREAK
 case 59:
 YY_RULE_SETUP
-#line 80 "scanner.l"
+#line 81 "scanner.l"
 { write_token(yytext, "NUMBER", "INTEGER"); } /* Numbers */
 	YY_BREAK
 case 60:
 YY_RULE_SETUP
-#line 81 "scanner.l"
+#line 82 "scanner.l"
 { write_token(yytext, "NUMBER", "FLOAT"); }
 	YY_BREAK
 case 61:
 YY_RULE_SETUP
-#line 82 "scanner.l"
+#line 83 "scanner.l"
 { write_token(yytext, "NUMBER", "HEX"); }
 	YY_BREAK
 case 62:
 /* rule 62 can match eol */
 YY_RULE_SETUP
-#line 85 "scanner.l"
+#line 86 "scanner.l"
 { write_token(yytext, "STRING", "LITERAL"); } /* Strings and Characters */
 	YY_BREAK
 case 63:
 /* rule 63 can match eol */
 YY_RULE_SETUP
-#line 86 "scanner.l"
+#line 87 "scanner.l"
 { write_token(yytext, "CHAR", "LITERAL"); }
 	YY_BREAK
 case 64:
 YY_RULE_SETUP
-#line 89 "scanner.l"
+#line 90 "scanner.l"
 { write_token(yytext, "IDENTIFIER", "VAR"); } /* Identifiers */
 	YY_BREAK
 case 65:
 YY_RULE_SETUP
-#line 92 "scanner.l"
+#line 93 "scanner.l"
 { write_token(yytext, "OPERATOR", "ADD"); } /* Operators */
 	YY_BREAK
 case 66:
 YY_RULE_SETUP
-#line 93 "scanner.l"
+#line 94 "scanner.l"
 { write_token(yytext, "OPERATOR", "SUB"); }
 	YY_BREAK
 case 67:
 YY_RULE_SETUP
-#line 94 "scanner.l"
+#line 95 "scanner.l"
 { write_token(yytext, "OPERATOR", "MUL"); }
 	YY_BREAK
 case 68:
 YY_RULE_SETUP
-#line 95 "scanner.l"
+#line 96 "scanner.l"
 { write_token(yytext, "OPERATOR", "DIV"); }
 	YY_BREAK
 case 69:
 YY_RULE_SETUP
-#line 96 "scanner.l"
+#line 97 "scanner.l"
 { write_token(yytext, "OPERATOR", "MOD"); }
 	YY_BREAK
 case 70:
 YY_RULE_SETUP
-#line 97 "scanner.l"
+#line 98 "scanner.l"
 { write_token(yytext, "OPERATOR", "INC"); }
 	YY_BREAK
 case 71:
 YY_RULE_SETUP
-#line 98 "scanner.l"
+#line 99 "scanner.l"
 { write_token(yytext, "OPERATOR", "DEC"); }
 	YY_BREAK
 case 72:
 YY_RULE_SETUP
-#line 99 "scanner.l"
+#line 100 "scanner.l"
 { write_token(yytext, "OPERATOR", "ASSIGN"); }
 	YY_BREAK
 case 73:
 YY_RULE_SETUP
-#line 100 "scanner.l"
+#line 101 "scanner.l"
 { write_token(yytext, "OPERATOR", "ADD_ASSIGN"); }
 	YY_BREAK
 case 74:
 YY_RULE_SETUP
-#line 101 "scanner.l"
+#line 102 "scanner.l"
 { write_token(yytext, "OPERATOR", "SUB_ASSIGN"); }
 	YY_BREAK
 case 75:
 YY_RULE_SETUP
-#line 102 "scanner.l"
+#line 103 "scanner.l"
 { write_token(yytext, "OPERATOR", "MUL_ASSIGN"); }
 	YY_BREAK
 case 76:
 YY_RULE_SETUP
-#line 103 "scanner.l"
+#line 104 "scanner.l"
 { write_token(yytext, "OPERATOR", "DIV_ASSIGN"); }
 	YY_BREAK
 case 77:
 YY_RULE_SETUP
-#line 104 "scanner.l"
+#line 105 "scanner.l"
 { write_token(yytext, "OPERATOR", "MOD_ASSIGN"); }
 	YY_BREAK
 case 78:
 YY_RULE_SETUP
-#line 105 "scanner.l"
+#line 106 "scanner.l"
 { write_token(yytext, "OPERATOR", "EQ"); }
 	YY_BREAK
 case 79:
 YY_RULE_SETUP
-#line 106 "scanner.l"
+#line 107 "scanner.l"
 { write_token(yytext, "OPERATOR", "NEQ"); }
 	YY_BREAK
 case 80:
 YY_RULE_SETUP
-#line 107 "scanner.l"
+#line 108 "scanner.l"
 { write_token(yytext, "OPERATOR", "LT"); }
 	YY_BREAK
 case 81:
 YY_RULE_SETUP
-#line 108 "scanner.l"
+#line 109 "scanner.l"
 { write_token(yytext, "OPERATOR", "GT"); }
 	YY_BREAK
 case 82:
 YY_RULE_SETUP
-#line 109 "scanner.l"
+#line 110 "scanner.l"
 { write_token(yytext, "OPERATOR", "LTE"); }
 	YY_BREAK
 case 83:
 YY_RULE_SETUP
-#line 110 "scanner.l"
+#line 111 "scanner.l"
 { write_token(yytext, "OPERATOR", "GTE"); }
 	YY_BREAK
 case 84:
 YY_RULE_SETUP
-#line 111 "scanner.l"
+#line 112 "scanner.l"
 { write_token(yytext, "OPERATOR", "AND"); }
 	YY_BREAK
 case 85:
 YY_RULE_SETUP
-#line 112 "scanner.l"
+#line 113 "scanner.l"
 { write_token(yytext, "OPERATOR", "OR"); }
 	YY_BREAK
 case 86:
 YY_RULE_SETUP
-#line 113 "scanner.l"
+#line 114 "scanner.l"
 { write_token(yytext, "OPERATOR", "NOT"); }
 	YY_BREAK
 case 87:
 YY_RULE_SETUP
-#line 114 "scanner.l"
+#line 115 "scanner.l"
 { write_token(yytext, "OPERATOR", "BIT_AND"); }
 	YY_BREAK
 case 88:
 YY_RULE_SETUP
-#line 115 "scanner.l"
+#line 116 "scanner.l"
 { write_token(yytext, "OPERATOR", "BIT_OR"); }
 	YY_BREAK
 case 89:
 YY_RULE_SETUP
-#line 116 "scanner.l"
+#line 117 "scanner.l"
 { write_token(yytext, "OPERATOR", "BIT_XOR"); }
 	YY_BREAK
 case 90:
 YY_RULE_SETUP
-#line 117 "scanner.l"
+#line 118 "scanner.l"
 { write_token(yytext, "OPERATOR", "BIT_NOT"); }
 	YY_BREAK
 case 91:
 YY_RULE_SETUP
-#line 118 "scanner.l"
+#line 119 "scanner.l"
 { write_token(yytext, "OPERATOR", "SHIFT_LEFT"); }
 	YY_BREAK
 case 92:
 YY_RULE_SETUP
-#line 119 "scanner.l"
+#line 120 "scanner.l"
 { write_token(yytext, "OPERATOR", "SHIFT_RIGHT"); }
 	YY_BREAK
 case 93:
 YY_RULE_SETUP
-#line 120 "scanner.l"
+#line 121 "scanner.l"
 { write_token(yytext, "OPERATOR", "ARROW"); }
 	YY_BREAK
 case 94:
 YY_RULE_SETUP
-#line 121 "scanner.l"
+#line 122 "scanner.l"
 { write_token(yytext, "OPERATOR", "SCOPE"); }
 	YY_BREAK
 case 95:
 YY_RULE_SETUP
-#line 124 "scanner.l"
+#line 125 "scanner.l"
 { write_token(yytext, "PUNCTUATION", "LPAREN"); } /* Punctuation */
 	YY_BREAK
 case 96:
 YY_RULE_SETUP
-#line 125 "scanner.l"
+#line 126 "scanner.l"
 { write_token(yytext, "PUNCTUATION", "RPAREN"); }
 	YY_BREAK
 case 97:
 YY_RULE_SETUP
-#line 126 "scanner.l"
+#line 127 "scanner.l"
 { write_token(yytext, "PUNCTUATION", "LBRACE"); }
 	YY_BREAK
 case 98:
 YY_RULE_SETUP
-#line 127 "scanner.l"
+#line 128 "scanner.l"
 { write_token(yytext, "PUNCTUATION", "RBRACE"); }
 	YY_BREAK
 case 99:
 YY_RULE_SETUP
-#line 128 "scanner.l"
+#line 129 "scanner.l"
 { write_token(yytext, "PUNCTUATION", "LBRACKET"); }
 	YY_BREAK
 case 100:
 YY_RULE_SETUP
-#line 129 "scanner.l"
+#line 130 "scanner.l"
 { write_token(yytext, "PUNCTUATION", "RBRACKET"); }
 	YY_BREAK
 case 101:
 YY_RULE_SETUP
-#line 130 "scanner.l"
+#line 131 "scanner.l"
 { write_token(yytext, "PUNCTUATION", "SEMICOLON"); }
 	YY_BREAK
 case 102:
 YY_RULE_SETUP
-#line 131 "scanner.l"
+#line 132 "scanner.l"
 { write_token(yytext, "PUNCTUATION", "COMMA"); }
 	YY_BREAK
 case 103:
 YY_RULE_SETUP
-#line 132 "scanner.l"
+#line 133 "scanner.l"
 { write_token(yytext, "PUNCTUATION", "DOT"); }
 	YY_BREAK
 case 104:
 YY_RULE_SETUP
-#line 133 "scanner.l"
+#line 134 "scanner.l"
 { write_token(yytext, "PUNCTUATION", "COLON"); }
 	YY_BREAK
 case 105:
 YY_RULE_SETUP
-#line 134 "scanner.l"
+#line 135 "scanner.l"
 { write_token(yytext, "PUNCTUATION", "QUESTION"); }
 	YY_BREAK
 case 106:
 YY_RULE_SETUP
-#line 136 "scanner.l"
+#line 137 "scanner.l"
 { write_token(yytext, "PREPROCESSOR", "INCLUDE"); } /* Preprocessor Directives */
 	YY_BREAK
 case 107:
 YY_RULE_SETUP
-#line 137 "scanner.l"
+#line 138 "scanner.l"
 { write_token(yytext, "PREPROCESSOR", "DEFINE"); }
 	YY_BREAK
 case 108:
 YY_RULE_SETUP
-#line 138 "scanner.l"
+#line 139 "scanner.l"
 { write_token(yytext, "PREPROCESSOR", "IFDEF"); }
 	YY_BREAK
 case 109:
 YY_RULE_SETUP
-#line 139 "scanner.l"
+#line 140 "scanner.l"
 { write_token(yytext, "PREPROCESSOR", "IFNDEF"); }
 	YY_BREAK
 case 110:
 YY_RULE_SETUP
-#line 140 "scanner.l"
+#line 141 "scanner.l"
 { write_token(yytext, "PREPROCESSOR", "ENDIF"); }
 	YY_BREAK
 case 111:
 YY_RULE_SETUP
-#line 141 "scanner.l"
+#line 142 "scanner.l"
 { write_token(yytext, "PREPROCESSOR", "IF"); }
 	YY_BREAK
 case 112:
 YY_RULE_SETUP
-#line 142 "scanner.l"
+#line 143 "scanner.l"
 { write_token(yytext, "PREPROCESSOR", "ELSE"); }
 	YY_BREAK
 case 113:
 YY_RULE_SETUP
-#line 143 "scanner.l"
+#line 144 "scanner.l"
 { write_token(yytext, "PREPROCESSOR", "ELIF"); }
 	YY_BREAK
 case 114:
 YY_RULE_SETUP
-#line 145 "scanner.l"
+#line 146 "scanner.l"
 { write_token(yytext, "ERROR", "INVALID"); }
 	YY_BREAK
 case 115:
 YY_RULE_SETUP
-#line 146 "scanner.l"
+#line 147 "scanner.l"
 ECHO;
 	YY_BREAK
 #line 1595 "scanner.c"
@@ -2593,7 +2593,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 146 "scanner.l"
+#line 147 "scanner.l"
 
 
 int main(int argc, char *argv[]) {
