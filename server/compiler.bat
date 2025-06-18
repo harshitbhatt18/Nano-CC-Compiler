@@ -16,10 +16,10 @@ if %ERRORLEVEL% EQU 0 (
     echo Running lexical analysis with Lex...
     cd %LEXICAL_DIR%
     lex -o scanner.c scanner.l
-    gcc scanner.c -o scanner.exe
+    g++ scanner.c -o scanner.exe
     
     if exist scanner.exe (
-        scanner.exe input.cc > parseTable.txt
+        scanner.exe input.cc 
         echo Lexical analysis completed.
         cd ..
     ) else (
@@ -27,26 +27,22 @@ if %ERRORLEVEL% EQU 0 (
        
         cd ..
     )
+
+    :: Run the shell script from Syntax Analyzer
+    echo Running Syntax Analyzer with Bison...
+    copy /Y lexical\input.cc "Syntax Analyzer\input.cc"
+    "C:\Program Files\Git\bin\sh.exe" "Syntax Analyzer/compile.sh"
+
 ) else (
     echo Lex not found. 
   
 )
 
-::if not exist %LEXICAL_DIR%\symbolTable (
-    echo NAME    TYPE    SCOPE    VALUE > %LEXICAL_DIR%\symbolTable
-    echo test    int     global   0 >> %LEXICAL_DIR%\symbolTable
-    echo value   int     global   0 >> %LEXICAL_DIR%\symbolTable
-::)
-
-::if not exist %LEXICAL_DIR%\constantTable (
-    echo VALUE    TYPE > %LEXICAL_DIR%\constantTable
-    echo 1        INT >> %LEXICAL_DIR%\constantTable
-    echo 2        INT >> %LEXICAL_DIR%\constantTable
-::)
 
 :: Compile the input.cc file
 g++ %LEXICAL_DIR%\input.cc -o output.exe 2>error.txt
 set COMPILE_ERROR=%ERRORLEVEL%
+
 
 :: Check if compilation was successful
 if %COMPILE_ERROR% EQU 0 (

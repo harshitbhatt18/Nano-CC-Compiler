@@ -732,7 +732,7 @@ char *yytext;
 int line_no = 1;
 FILE *outfile;
 
-void write_token(char* lexeme, char* type, char* attribute) {
+void write_token(const char* lexeme, const char* type, const char* attribute) {
     fprintf(outfile, "%-20s | %-15s | %-15s | %-8d\n", 
             lexeme, type, attribute, line_no);
 }

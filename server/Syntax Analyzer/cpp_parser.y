@@ -1,4 +1,4 @@
-%expect 2
+%expect 3
 %{
 #include <stdio.h>
 #include <string.h>
@@ -32,8 +32,26 @@ struct tokenList
 };
 typedef struct tokenList tokenList;
 
+// Declaration context tracking
+int inDeclarationContext = 0;
+
+// Scope tracking
+int scopeCount = 0;
+
+// External declarations for variables used in checkDeclaration
+extern tokenList *symbolPtr;
+extern int errorFlag;
+extern char *sourceCode;
+
+// Define these variables to ensure they're available in this file
+tokenList *symbolPtr = NULL;
+int errorFlag = 0;
+char *sourceCode = NULL;
+
 // External declaration of makeList function defined in the lexical analyzer
 extern void makeList(char *tokenName, char tokenType, int tokenLine);
+int yylex(void);
+void yyerror(const char *s);
 
 // Function declaration tracker
 void addFunctionDeclaration(const char *name, int lineNo) {
@@ -67,12 +85,47 @@ FunctionDecl* findFunctionDeclaration(const char *name) {
     return NULL;
 }
 
+// Function to check variable declarations
+void checkDeclaration(char *name, int line, int scope) {
+    // Only check declarations in declaration context
+    if (!inDeclarationContext) {
+        return;
+    }
+    
+    // Check if variable is already declared in current scope
+    for(tokenList *p = symbolPtr; p != NULL; p = p->next) {
+        if(strcmp(p->token, name) == 0) {
+            // Found a declaration - check if it's in the same scope
+            char *lastLine = strrchr(p->line, ' ');
+            if(lastLine && atoi(lastLine) == line) {
+                // Same line - this is a redeclaration
+                errorFlag = 1;
+                printf("\n%s : %d : Error: Redeclaration of variable '%s'\n", 
+                       sourceCode, line, name);
+                return;
+            }
+        }
+    }
+}
+
 // Current function being defined or declared
 char currentFunctionName[64] = "";
 
 // Current parameter being processed
 int currentParamIndex = 0;
 char currentParamType[64] = "";
+
+// Stream operator tracking for error detection
+int lastStreamOpIsLeft = 0;  // 1 for <<, 0 for >>
+int lastStreamObjIsCout = 0; // 1 for cout, 0 for cin
+int mixedStreamOps = 0;      // Flag to detect mixed << and >> in the same stream
+
+// Namespace tracking
+int stdNamespaceUsed = 0;    // Flag to track if "using namespace std;" is present
+int namespaceCheckEnabled = 1; // Enable namespace checking by default
+
+// Current token for error reporting
+char lastToken[64] = "";
 
 extern FILE *yyin;
 extern int lineCount;
@@ -81,20 +134,46 @@ extern int nestedCommentCount;
 extern int commentFlag;
 
 // Define table pointers directly, they will be shared with the lexical analyzer
-tokenList *symbolPtr = NULL;
 tokenList *constantPtr = NULL;
 tokenList *parsedPtr = NULL;
 
 // Improved type tracking
 char typeBuffer[20] = "UNKNOWN"; // Use a string instead of a single char
 
-char *sourceCode=NULL;
-int errorFlag=0;
+int errorCount=0; // Track the number of syntax errors
+
+// Extended error information
+typedef struct ErrorInfo {
+    int line;
+    char message[256];
+    struct ErrorInfo *next;
+} ErrorInfo;
+
+ErrorInfo *errorList = NULL;
+
+// Add error to the list for later reporting
+void addError(int line, const char *message) {
+    ErrorInfo *newError = (ErrorInfo*)malloc(sizeof(ErrorInfo));
+    newError->line = line;
+    strncpy(newError->message, message, 255);
+    newError->message[255] = '\0';
+    newError->next = errorList;
+    errorList = newError;
+    errorCount++;
+}
 
 // Set the current type based on type specifiers
 void setType(const char* type) {
     strncpy(typeBuffer, type, 19);
     typeBuffer[19] = '\0'; // Ensure null termination
+}
+
+// Track the current token for error reporting
+void trackToken(const char* token) {
+    if (token != NULL) {
+        strncpy(lastToken, token, 63);
+        lastToken[63] = '\0';
+    }
 }
 
 // Type combination helper - combine qualifiers with types
@@ -109,14 +188,14 @@ void appendType(const char* additional) {
     typeBuffer[19] = '\0'; // Ensure null termination
 }
 
-// makeList function is now defined in the lexical analyzer
-
+// parse tree node structure
 typedef struct ParseTreeNode {
     char name[64];
     struct ParseTreeNode *child;
     struct ParseTreeNode *sibling;
 } ParseTreeNode;
 
+//allocate memory for the node and initialize it
 ParseTreeNode* createNode(const char* name, ParseTreeNode* child, ParseTreeNode* sibling) {
     ParseTreeNode* node = (ParseTreeNode*)malloc(sizeof(ParseTreeNode));
     strcpy(node->name, name);
@@ -125,7 +204,7 @@ ParseTreeNode* createNode(const char* name, ParseTreeNode* child, ParseTreeNode*
     return node;
 }
 
-// Added function to flatten recursive structures
+// Added function to combine related nodes or same name nodes
 ParseTreeNode* flattenTree(const char* nodeName, ParseTreeNode* first, ParseTreeNode* second) {
     // If both are NULL, just create a simple node
     if (!first && !second) {
@@ -174,7 +253,7 @@ ParseTreeNode* flattenTree(const char* nodeName, ParseTreeNode* first, ParseTree
 
 void printParseTree(ParseTreeNode* node, int level, FILE* fp) {
     if (!node) return;
-    for (int i = 0; i < level; ++i) fprintf(fp, "  ");
+    for (int i = 0; i < level; ++i) fprintf(fp, "\t");
     fprintf(fp, "%s\n", node->name);
     printParseTree(node->child, level + 1, fp);
     printParseTree(node->sibling, level, fp);
@@ -233,6 +312,7 @@ ParseTreeNode* root = NULL;
 /* C++ specific types */
 %type <node> class_definition class_head class_body base_clause access_specifier member_list member_declaration
 %type <node> constructor_definition destructor_definition
+%type <node> stream_expression
 
 /* C tokens */
 %token AUTO BREAK CASE CHAR CONST CONTINUE DEFAULT DO DOUBLE ELSE ENUM 
@@ -242,6 +322,8 @@ ParseTreeNode* root = NULL;
 /* C++ specific tokens */
 %token CATCH CLASS DELETE FRIEND INLINE NAMESPACE NEW PRIVATE PROTECTED PUBLIC
 %token TEMPLATE THIS THROW TRY USING VIRTUAL BOOL BOOL_LITERAL SCOPE_OP
+%token IOSTREAM_IN IOSTREAM_OUT
+%token IOSTREAM_IN_MISSPELLED IOSTREAM_OUT_MISSPELLED
 
 %token IDENTIFIER CONSTANT STRING_LITERAL ELLIPSIS
 
@@ -276,13 +358,19 @@ primary_expression
 	: IDENTIFIER  		{ 
 		makeList(tablePtr, 'v', lineCount); 
 		strcpy(currentFunctionName, tablePtr);
+		trackToken(tablePtr);
+		// Check for variable use (not a declaration)
+		if (!inDeclarationContext) {
+		    // This is a variable use, not a declaration
+		    // Could check if variable is declared before use
+		}
 		$$ = createNode("IDENTIFIER", NULL, NULL); 
 	}
-	| CONSTANT    		{ makeList(tablePtr, 'c', lineCount); $$ = createNode("CONSTANT", NULL, NULL); }
-	| STRING_LITERAL  	{ makeList(tablePtr, 's', lineCount); $$ = createNode("STRING_LITERAL", NULL, NULL); }
-	| '(' expression ')' 	{ makeList("(", 'p', lineCount); makeList(")", 'p', lineCount); $$ = createNode("(expr)", $2, NULL); }
-	| BOOL_LITERAL      { makeList(tablePtr, 'c', lineCount); $$ = createNode("BOOL_LITERAL", NULL, NULL); } /* C++ specific */
-	| THIS             { makeList(tablePtr, 'k', lineCount); $$ = createNode("this", NULL, NULL); } /* C++ specific */
+	| CONSTANT    		{ makeList(tablePtr, 'c', lineCount); trackToken(tablePtr); $$ = createNode("CONSTANT", NULL, NULL); }
+	| STRING_LITERAL  	{ makeList(tablePtr, 's', lineCount); trackToken(tablePtr); $$ = createNode("STRING_LITERAL", NULL, NULL); }
+	| '(' expression ')' 	{ makeList("(", 'p', lineCount); makeList(")", 'p', lineCount); trackToken(")"); $$ = createNode("(expr)", $2, NULL); }
+	| BOOL_LITERAL      { makeList(tablePtr, 'c', lineCount); trackToken(tablePtr); $$ = createNode("BOOL_LITERAL", NULL, NULL); } /* C++ specific */
+	| THIS             { makeList(tablePtr, 'k', lineCount); trackToken(tablePtr); $$ = createNode("this", NULL, NULL); } /* C++ specific */
 	;
 
 postfix_expression
@@ -301,8 +389,23 @@ postfix_expression
 	| postfix_expression PTR_OP IDENTIFIER { $$ = createNode("PTR_OP IDENTIFIER", $1, NULL); }
 	| postfix_expression INC_OP { $$ = createNode("INC_OP", $1, NULL); }
 	| postfix_expression DEC_OP { $$ = createNode("DEC_OP", $1, NULL); }
-    | IDENTIFIER SCOPE_OP IDENTIFIER { $$ = createNode("SCOPE_OP", NULL, NULL); } /* C++ specific */
+    | IDENTIFIER SCOPE_OP IDENTIFIER { 
+        // Check if this is a std::cin or std::cout
+        if (strcmp(tablePtr, "cin") == 0 || strcmp(tablePtr, "cout") == 0) {
+            // Since std:: prefix is used, disable namespace checking
+            namespaceCheckEnabled = 0;
+            printf("Found 'std::%s' - namespace correctly used\n", tablePtr);
+        }
+        $$ = createNode("SCOPE_OP", NULL, NULL); 
+    } /* C++ specific */
     | postfix_expression LEFT_OP primary_expression { $$ = createNode("<<", $1, $3); } /* C++ iostream */
+    /* Common cout mistake - treating cout as a function */
+    | IOSTREAM_OUT '(' primary_expression ')' { 
+        makeList("(", 'p', lineCount);
+        makeList(")", 'p', lineCount);
+        addError(lineCount, "Invalid cout usage: cout is not a function, use 'cout << expression' instead of 'cout(expression)'");
+        $$ = createNode("ERROR", NULL, NULL); 
+    }
 	;
 
 argument_expression_list
@@ -462,10 +565,7 @@ assignment_operator
 
 expression
 	: assignment_expression { $$ = $1; }
-	| expression ',' assignment_expression { 
-		makeList(",", 'p', lineCount); 
-		$$ = createNode(",", $1, $3); 
-	}
+	| expression ',' assignment_expression { $$ = createNode(",", $1, $3); }
 	;
 
 constant_expression
@@ -477,7 +577,23 @@ class_definition
     : class_head '{' class_body '}' { 
         makeList("{", 'p', lineCount);
         makeList("}", 'p', lineCount);
+        inDeclarationContext = 1; // Set context flag
         $$ = createNode("class_definition", $1, $3); 
+        inDeclarationContext = 0; // Reset context flag
+    }
+    | class_head '{' error '}' {
+        makeList("{", 'p', lineCount);
+        makeList("}", 'p', lineCount);
+        inDeclarationContext = 1; // Set context flag
+        yyerror("Syntax error in class body");
+        $$ = createNode("class_definition_error", $1, NULL);
+        inDeclarationContext = 0; // Reset context flag
+    }
+    | class_head error {
+        inDeclarationContext = 1; // Set context flag
+        yyerror("Missing opening brace '{' in class definition");
+        $$ = createNode("class_definition_error", $1, NULL);
+        inDeclarationContext = 0; // Reset context flag
     }
     ;
 
@@ -556,14 +672,21 @@ translation_unit
         makeList(tablePtr, 'v', lineCount);
         makeList("{", 'p', lineCount);
         makeList("}", 'p', lineCount);
+        inDeclarationContext = 1; // Set context flag
         $$ = createNode("namespace", $4, NULL); 
-        root = $$; 
+        root = $$;
+        inDeclarationContext = 0; // Reset context flag
     }
     | USING NAMESPACE IDENTIFIER ';' { 
         makeList("using", 'k', lineCount);
         makeList("namespace", 'k', lineCount);
         makeList(tablePtr, 'v', lineCount);
         makeList(";", 'p', lineCount);
+        // Check if it's the std namespace
+        if (strcmp(tablePtr, "std") == 0) {
+            stdNamespaceUsed = 1; // Mark std namespace as used
+            printf("Found 'using namespace std;' - iostream objects can be used directly\n");
+        }
         $$ = createNode("using_namespace", NULL, NULL); 
         root = $$; 
     }
@@ -578,8 +701,33 @@ translation_unit
         makeList(tablePtr, 'v', lineCount);
         makeList("<", 'p', lineCount);
         makeList(">", 'p', lineCount);
+        // Check if iostream is included
+        if (strcmp(tablePtr, "iostream") == 0) {
+            // This is important for iostream operations, but doesn't affect namespace usage
+            // Still need using namespace std; or std:: prefix
+            printf("Found '#include <iostream>' - iostream library included\n");
+        }
         $$ = createNode("preprocessor_include", NULL, NULL); 
         root = $$; 
+    }
+    | NAMESPACE IDENTIFIER error translation_unit '}' {
+        inDeclarationContext = 1; // Set context flag
+        yyerror("Missing opening brace in namespace definition");
+        $$ = createNode("namespace_error", $4, NULL);
+        root = $$;
+        inDeclarationContext = 0; // Reset context flag
+    }
+    | NAMESPACE IDENTIFIER '{' translation_unit error {
+        inDeclarationContext = 1; // Set context flag
+        yyerror("Missing closing brace in namespace definition");
+        $$ = createNode("namespace_error", $4, NULL);
+        root = $$;
+        inDeclarationContext = 0; // Reset context flag
+    }
+    | USING NAMESPACE IDENTIFIER error {
+        yyerror("Missing semicolon after using namespace directive");
+        $$ = createNode("using_namespace_error", NULL, NULL);
+        root = $$;
     }
     ;
 
@@ -592,35 +740,78 @@ external_declaration
 
 function_definition
 	: declaration_specifiers declarator declaration_list compound_statement {
+		inDeclarationContext = 1; // Set context flag for function declaration
 		$$ = flattenTree("function_definition", $1, flattenTree("function_parts", $2, flattenTree("function_parts", $3, $4)));
+		inDeclarationContext = 0; // Reset context flag
 	}
 	| declaration_specifiers declarator compound_statement {
+		inDeclarationContext = 1; // Set context flag for function declaration
 		$$ = flattenTree("function_definition", $1, flattenTree("function_parts", $2, $3));
         
         // Function implementation checks
         FunctionDecl* decl = findFunctionDeclaration(currentFunctionName);
         if (decl) {
             // Check existing declaration against current implementation
-            // (would add parameter type checking here)
+            // Type checking for parameters could be added here
+            if (strcmp(typeBuffer, "char") == 0 && currentParamIndex > 0) {
+                // We're processing a char parameter
+                // Check if it was declared as a different type
+                if (decl->paramCount >= currentParamIndex && 
+                    strcmp(decl->paramTypes[currentParamIndex-1], "int") == 0) {
+                    errorFlag = 1;
+                    printf("\n%s : %d : Type Error: Parameter type mismatch in function '%s'\n", 
+                           sourceCode, lineCount, currentFunctionName);
+                    printf("Line %d declared parameter %d as 'int' but defined as 'char' on line %d\n",
+                           decl->lineNo, currentParamIndex, lineCount);
+                }
+            }
         }
-        // Otherwise this is a new function without a prior declaration
+        inDeclarationContext = 0; // Reset context flag
 	}
 	| declarator declaration_list compound_statement {
+		inDeclarationContext = 1; // Set context flag
 		$$ = flattenTree("function_definition", $1, flattenTree("function_parts", $2, $3));
+		inDeclarationContext = 0; // Reset context flag
 	}
 	| declarator compound_statement {
+		inDeclarationContext = 1; // Set context flag
 		$$ = flattenTree("function_definition", $1, $2);
+		inDeclarationContext = 0; // Reset context flag
 	}
+    | declaration_specifiers declarator error {
+        inDeclarationContext = 1; // Set context flag
+        yyerror("Invalid function definition - missing body or semicolon");
+        $$ = createNode("function_definition_error", NULL, NULL);
+        inDeclarationContext = 0; // Reset context flag
+    }
 	;
 
 declaration
 	: declaration_specifiers ';' { 
 		makeList(";", 'p', lineCount);
+		trackToken(";");
+		inDeclarationContext = 1; // Set context flag
 		$$ = flattenTree("declaration", $1, NULL); 
+		inDeclarationContext = 0; // Reset context flag
 	}
 	| declaration_specifiers init_declarator_list ';' { 
 		makeList(";", 'p', lineCount);
+		trackToken(";");
+		inDeclarationContext = 1; // Set context flag
 		$$ = flattenTree("declaration", $1, $2); 
+		inDeclarationContext = 0; // Reset context flag
+	}
+    | declaration_specifiers error ';' {
+        inDeclarationContext = 1; // Set context flag
+        yyerror("Syntax error in declaration");
+        $$ = createNode("error", NULL, NULL);
+        inDeclarationContext = 0; // Reset context flag
+    }
+	| declaration_specifiers init_declarator_list error {
+		inDeclarationContext = 1; // Set context flag
+		yyerror("Missing semicolon after declaration");
+		$$ = flattenTree("declaration", $1, $2);
+		inDeclarationContext = 0; // Reset context flag
 	}
 	;
 
@@ -743,36 +934,66 @@ direct_declarator
     : IDENTIFIER { 
         // Track the identifier and add it to symbol table
         makeList(tablePtr, 'v', lineCount);
+        trackToken(tablePtr);
+        // Check for variable/function declaration
+        if (inDeclarationContext) {
+            // This is a variable or function declaration
+            checkDeclaration(tablePtr, lineCount, scopeCount);
+            if (strcmp(typeBuffer, "UNKNOWN") != 0) {
+                // If function declaration, track it
+                if (strstr(tablePtr, "(") != NULL) {
+                    addFunctionDeclaration(tablePtr, lineCount);
+                }
+            }
+        }
         $$ = createNode("identifier", NULL, NULL); 
     }
     | '(' declarator ')' { 
         makeList("(", 'p', lineCount);
         makeList(")", 'p', lineCount);
+        trackToken(")");
         $$ = $2; 
     }
     | direct_declarator '[' ']' { 
         makeList("[", 'p', lineCount);
         makeList("]", 'p', lineCount);
+        trackToken("]");
         $$ = createNode("array_declarator", $1, NULL); 
     }
     | direct_declarator '[' constant_expression ']' { 
         makeList("[", 'p', lineCount);
         makeList("]", 'p', lineCount);
+        trackToken("]");
         $$ = createNode("array_size_declarator", $1, $3); 
     }
     | direct_declarator '(' parameter_type_list ')' { 
         makeList("(", 'p', lineCount);
         makeList(")", 'p', lineCount);
+        trackToken(")");
+        // Function declaration
+        if (inDeclarationContext) {
+            addFunctionDeclaration(currentFunctionName, lineCount);
+        }
         $$ = createNode("function_declarator", $1, $3); 
     }
     | direct_declarator '(' identifier_list ')' { 
         makeList("(", 'p', lineCount);
         makeList(")", 'p', lineCount);
+        trackToken(")");
+        // Function declaration
+        if (inDeclarationContext) {
+            addFunctionDeclaration(currentFunctionName, lineCount);
+        }
         $$ = createNode("function_declarator", $1, $3); 
     }
     | direct_declarator '(' ')' { 
         makeList("(", 'p', lineCount);
         makeList(")", 'p', lineCount);
+        trackToken(")");
+        // Function declaration
+        if (inDeclarationContext) {
+            addFunctionDeclaration(currentFunctionName, lineCount);
+        }
         $$ = createNode("function_declarator", $1, NULL); 
     }
     ;
@@ -800,9 +1021,35 @@ parameter_list
     ;
 
 parameter_declaration
-    : declaration_specifiers declarator { $$ = flattenTree("parameter", $1, $2); }
-    | declaration_specifiers abstract_declarator { $$ = flattenTree("abstract_parameter", $1, $2); }
-    | declaration_specifiers { $$ = $1; }
+    : declaration_specifiers declarator { 
+        inDeclarationContext = 1; // Parameters are declarations
+        currentParamIndex++;
+        // Track parameter type in case we need it for type checking
+        if (strcmp(typeBuffer, "char") == 0) {
+            strcpy(currentParamType, "char");
+            addFunctionParameter("char");
+        } else if (strcmp(typeBuffer, "int") == 0) {
+            strcpy(currentParamType, "int");
+            addFunctionParameter("int");
+        } else {
+            strcpy(currentParamType, typeBuffer);
+            addFunctionParameter(typeBuffer);
+        }
+        $$ = flattenTree("parameter", $1, $2); 
+        inDeclarationContext = 0;
+    }
+    | declaration_specifiers abstract_declarator { 
+        inDeclarationContext = 1;
+        currentParamIndex++;
+        $$ = flattenTree("abstract_parameter", $1, $2); 
+        inDeclarationContext = 0;
+    }
+    | declaration_specifiers { 
+        inDeclarationContext = 1;
+        currentParamIndex++;
+        $$ = $1; 
+        inDeclarationContext = 0;
+    }
     ;
 
 identifier_list
@@ -871,8 +1118,22 @@ labeled_statement
     ;
 
 compound_statement
-    : '{' '}' { makeList("{", 'p', lineCount); makeList("}", 'p', lineCount); $$ = createNode("compound", NULL, NULL); }
-    | '{' block_item_list '}' { makeList("{", 'p', lineCount); makeList("}", 'p', lineCount); $$ = createNode("compound", $2, NULL); }
+    : '{' '}' { 
+        makeList("{", 'p', lineCount); 
+        makeList("}", 'p', lineCount); 
+        trackToken("}");
+        scopeCount++; // New scope
+        $$ = createNode("compound", NULL, NULL); 
+        scopeCount--; // Exit scope
+    }
+    | '{' block_item_list '}' { 
+        makeList("{", 'p', lineCount); 
+        makeList("}", 'p', lineCount); 
+        trackToken("}");
+        scopeCount++; // New scope
+        $$ = createNode("compound", $2, NULL); 
+        scopeCount--; // Exit scope
+    }
     ;
 
 block_item_list
@@ -886,8 +1147,13 @@ block_item
     ;
 
 expression_statement
-    : ';' { makeList(";", 'p', lineCount); $$ = createNode("empty", NULL, NULL); }
-    | expression ';' { makeList(";", 'p', lineCount); $$ = $1; }
+    : ';' { makeList(";", 'p', lineCount); $$ = createNode(";", NULL, NULL); }
+    | expression ';' { makeList(";", 'p', lineCount); $$ = createNode("expression_stmt", $1, NULL); }
+    | stream_expression ';' { makeList(";", 'p', lineCount); $$ = createNode("stream_stmt", $1, NULL); }
+    | stream_expression error { 
+        addError(lineCount, "Missing semicolon after stream expression");
+        $$ = createNode("stream_stmt_error", $1, NULL);
+    }
     ;
 
 selection_statement
@@ -909,6 +1175,22 @@ selection_statement
         makeList("(", 'p', lineCount);
         makeList(")", 'p', lineCount);
         $$ = createNode("switch", $3, $5); 
+    }
+    | IF error expression ')' statement {
+        yyerror("Missing opening parenthesis in if statement");
+        $$ = createNode("if_error", $3, $5);
+    }
+    | IF '(' expression error statement {
+        yyerror("Missing closing parenthesis in if statement");
+        $$ = createNode("if_error", $3, $5);
+    }
+    | SWITCH error expression ')' statement {
+        yyerror("Missing opening parenthesis in switch statement");
+        $$ = createNode("switch_error", $3, $5);
+    }
+    | SWITCH '(' expression error statement {
+        yyerror("Missing closing parenthesis in switch statement");
+        $$ = createNode("switch_error", $3, $5);
     }
     ;
 
@@ -934,6 +1216,34 @@ iteration_statement
         makeList(";", 'p', lineCount);
         makeList(")", 'p', lineCount);
         $$ = create_for_node($3, $5, $7, $9); 
+    }
+    | WHILE error expression ')' statement {
+        yyerror("Missing opening parenthesis in while statement");
+        $$ = createNode("while_error", $3, $5);
+    }
+    | WHILE '(' expression error statement {
+        yyerror("Missing closing parenthesis in while statement");
+        $$ = createNode("while_error", $3, $5);
+    }
+    | DO statement WHILE error expression ')' ';' {
+        yyerror("Missing opening parenthesis in do-while statement");
+        $$ = createNode("do-while_error", $2, $5);
+    }
+    | DO statement WHILE '(' expression error ';' {
+        yyerror("Missing closing parenthesis in do-while statement");
+        $$ = createNode("do-while_error", $2, $5);
+    }
+    | DO statement WHILE '(' expression ')' error {
+        yyerror("Missing semicolon after do-while statement");
+        $$ = createNode("do-while_error", $2, $5);
+    }
+    | FOR error { 
+        yyerror("Invalid for loop syntax");
+        $$ = createNode("for_error", NULL, NULL);
+    }
+    | FOR '(' error ')' statement {
+        yyerror("Invalid for loop control expressions");
+        $$ = createNode("for_error", NULL, $5);
     }
     ;
 
@@ -983,9 +1293,174 @@ try_catch_statement
         makeList(")", 'p', lineCount);
         $$ = createNode("try_catch", $2, $7);
     }
+    | TRY compound_statement CATCH error parameter_declaration ')' compound_statement {
+        yyerror("Missing opening parenthesis in catch statement");
+        $$ = createNode("try_catch_error", $2, $7);
+    }
+    | TRY compound_statement CATCH '(' parameter_declaration error compound_statement {
+        yyerror("Missing closing parenthesis in catch statement");
+        $$ = createNode("try_catch_error", $2, $7);
+    }
+    | TRY error {
+        yyerror("Invalid try block");
+        $$ = createNode("try_error", NULL, NULL);
+    }
+    ;
+
+/* C++ specific iostream operations */
+stream_expression
+    : IOSTREAM_OUT LEFT_OP primary_expression { 
+        lastStreamOpIsLeft = 1;
+        lastStreamObjIsCout = 1;
+        mixedStreamOps = 0;
+        // Check if std namespace is used
+        if (namespaceCheckEnabled && !stdNamespaceUsed) {
+            addError(lineCount, "Namespace error: 'cout' used without 'std::' prefix and no 'using namespace std;' found. Use 'std::cout' or add 'using namespace std;'");
+        }
+        $$ = createNode("cout_op", NULL, $3); 
+    }
+    | IOSTREAM_IN RIGHT_OP primary_expression { 
+        lastStreamOpIsLeft = 0;
+        lastStreamObjIsCout = 0;
+        mixedStreamOps = 0;
+        // Check if std namespace is used
+        if (namespaceCheckEnabled && !stdNamespaceUsed) {
+            addError(lineCount, "Namespace error: 'cin' used without 'std::' prefix and no 'using namespace std;' found. Use 'std::cin' or add 'using namespace std;'");
+        }
+        $$ = createNode("cin_op", NULL, $3); 
+    }
+    | stream_expression LEFT_OP primary_expression { 
+        // Check for mixed operators in the same stream
+        if (!lastStreamOpIsLeft && lastStreamObjIsCout) {
+            mixedStreamOps = 1;
+            addError(lineCount, "Mixed stream operators: cannot mix '<<' and '>>' in the same stream operation");
+        }
+        if (!lastStreamOpIsLeft && !lastStreamObjIsCout) {
+            mixedStreamOps = 1;
+            addError(lineCount, "Mixed stream operators: cannot mix '>>' and '<<' in the same 'cin' stream operation");
+        }
+        lastStreamOpIsLeft = 1;
+        $$ = createNode("cout_op", $1, $3); 
+    }
+    | stream_expression RIGHT_OP primary_expression { 
+        // Check for mixed operators in the same stream
+        if (lastStreamOpIsLeft && lastStreamObjIsCout) {
+            mixedStreamOps = 1;
+            addError(lineCount, "Mixed stream operators: cannot mix '<<' and '>>' in the same 'cout' stream operation");
+        }
+        if (lastStreamOpIsLeft && !lastStreamObjIsCout) {
+            mixedStreamOps = 1;
+            addError(lineCount, "Mixed stream operators: cannot mix '>>' and '<<' in the same stream operation");
+        }
+        lastStreamOpIsLeft = 0;
+        $$ = createNode("cin_op", $1, $3); 
+    }
+    /* Rules for misspelled iostream objects */
+    | IOSTREAM_OUT_MISSPELLED LEFT_OP primary_expression { 
+        addError(lineCount, "Misspelled iostream object: did you mean 'cout'?");
+        $$ = createNode("ERROR", NULL, NULL);
+    }
+    | IOSTREAM_IN_MISSPELLED RIGHT_OP primary_expression { 
+        addError(lineCount, "Misspelled iostream object: did you mean 'cin'?");
+        $$ = createNode("ERROR", NULL, NULL);
+    }
+    | IOSTREAM_OUT_MISSPELLED RIGHT_OP primary_expression { 
+        addError(lineCount, "Misspelled iostream object: did you mean 'cout'? Also, 'cout' uses '<<', not '>>'");
+        $$ = createNode("ERROR", NULL, NULL);
+    }
+    | IOSTREAM_IN_MISSPELLED LEFT_OP primary_expression { 
+        addError(lineCount, "Misspelled iostream object: did you mean 'cin'? Also, 'cin' uses '>>', not '<<'");
+        $$ = createNode("ERROR", NULL, NULL);
+    }
+    | IOSTREAM_OUT RIGHT_OP primary_expression { 
+        makeList(">>", 'o', lineCount);
+        addError(lineCount, "Invalid stream operation: 'cout' uses '<<' (insertion operator), not '>>' (extraction operator)");
+        $$ = createNode("ERROR", NULL, NULL);
+    }
+    /* Comment out this problematic rule that causes reduce/reduce conflicts */
+    /*
+    | IOSTREAM_IN LEFT_OP primary_expression { 
+        makeList("<<", 'o', lineCount);
+        addError(lineCount, "Invalid stream operation: 'cin' uses '>>', not '<<' (insertion operator is for 'cout')");
+        $$ = createNode("ERROR", NULL, NULL);
+    }
+    */
+    | IOSTREAM_IN error primary_expression { 
+        if (strcmp(tablePtr, "<<") == 0) {
+            makeList("<<", 'o', lineCount);
+            addError(lineCount, "Invalid stream operation: 'cin' uses '>>', not '<<' (insertion operator is for 'cout')");
+        } else {
+            addError(lineCount, "Invalid stream operation with 'cin'");
+        }
+        $$ = createNode("ERROR", NULL, NULL);
+    }
+    | IOSTREAM_IN '<' primary_expression { 
+        makeList("<", 'o', lineCount);
+        addError(lineCount, "Invalid stream operation: expected '>>' for cin, not '<'");
+        $$ = createNode("ERROR", NULL, NULL);
+    }
+    | stream_expression LEFT_OP error { 
+        addError(lineCount, "Invalid or missing expression after '<<'");
+        $$ = createNode("ERROR", NULL, NULL);
+    }
+    | stream_expression RIGHT_OP error { 
+        addError(lineCount, "Invalid or missing expression after '>>'");
+        $$ = createNode("ERROR", NULL, NULL);
+    }
+    | stream_expression '>' primary_expression { 
+        makeList(">", 'o', lineCount);
+        addError(lineCount, "Invalid chained stream operation: expected '<<', not '>'");
+        $$ = createNode("ERROR", NULL, NULL);
+    }
+    | stream_expression '<' primary_expression { 
+        makeList("<", 'o', lineCount);
+        addError(lineCount, "Invalid chained stream operation: expected '>>', not '<'");
+        $$ = createNode("ERROR", NULL, NULL);
+    }
+    /* Error for using string literal directly with stream operators - common mistake */
+    | LEFT_OP STRING_LITERAL { 
+        makeList("<<", 'o', lineCount);
+        makeList(tablePtr, 's', lineCount);
+        addError(lineCount, "Invalid stream syntax: stream operator must be used with iostream object, e.g. 'cout << \"string\"'");
+        $$ = createNode("ERROR", NULL, NULL);
+    }
+    | RIGHT_OP IDENTIFIER { 
+        makeList(">>", 'o', lineCount);
+        makeList(tablePtr, 'v', lineCount);
+        addError(lineCount, "Invalid stream syntax: stream operator must be used with iostream object, e.g. 'cin >> variable'");
+        $$ = createNode("ERROR", NULL, NULL);
+    }
     ;
 
 %%
+
+void yyerror(const char *s) {
+    errorFlag = 1;
+	fflush(stdout);
+	
+	fprintf(yyerrfile, "\nSyntax Errors\n");
+	fprintf(yyerrfile, "\n%s : %d : Syntax Error\n", sourceCode, lineCount);
+	if (tablePtr) {
+		fprintf(yyerrfile, "Error near token: %s\n", tablePtr);
+		if (inDeclarationContext) {
+			fprintf(yyerrfile, "Context: Variable/Function declaration\n");
+		} 
+        else {
+			fprintf(yyerrfile, "Context: Expression or statement\n");
+		}
+		printf("\n%s : %d : Syntax Error\n", sourceCode, lineCount);
+		printf("Error near token: %s\n", tablePtr);
+	}
+    else {
+		fprintf(yyerrfile, "Error: Unexpected token or end of input\n");
+		printf("\n%s : %d : Syntax Error\n", sourceCode, lineCount);
+		printf("Error: Unexpected token or end of input\n");
+	}
+    // Store the error for summary reporting
+    char errorMsg[256];
+    sprintf(errorMsg, "Syntax Error near %s", tablePtr ? tablePtr : (lastToken[0] != '\0' ? lastToken : "end of input"));
+    addError(lineCount, errorMsg);
+}
 
 int main(int argc, char *argv[])
 {
@@ -994,6 +1469,32 @@ int main(int argc, char *argv[])
     constantPtr = NULL;
     parsedPtr = NULL;
     errorFlag = 0;
+    errorCount = 0;
+    errorList = NULL;
+    
+    // Reset error flags and type checking variables
+    commentFlag = 0;
+    nestedCommentCount = 0;
+    
+    // Reset function declaration tracking
+    functionTable = NULL;
+    currentFunctionName[0] = '\0';
+    currentParamIndex = 0;
+    currentParamType[0] = '\0';
+    lastToken[0] = '\0';
+    
+    // Reset context tracking
+    inDeclarationContext = 0;
+    scopeCount = 0;
+    
+    // Reset stream operator tracking
+    lastStreamOpIsLeft = 0;
+    lastStreamObjIsCout = 0;
+    mixedStreamOps = 0;
+    
+    // Reset namespace tracking
+    stdNamespaceUsed = 0;
+    namespaceCheckEnabled = 1;
     
     // Set default type
     strcpy(typeBuffer, "UNKNOWN");
@@ -1002,7 +1503,7 @@ int main(int argc, char *argv[])
 	yyerrfile = fopen("syntaxErrors.txt", "w");
 	if (!yyerrfile) {
 		printf("Error: Could not open syntaxErrors.txt for writing\n");
-		return;
+		return 1;
 	}
 	
     if(argc > 1) {
@@ -1022,10 +1523,19 @@ int main(int argc, char *argv[])
 
     // Run the parser
     yyparse();
+    
+    // Check for comment errors
+	if(nestedCommentCount!=0){
+		errorFlag=1;
+    	printf("%s : %d : Comment Does Not End\n",sourceCode,lineCount);
+	}
+	if(commentFlag==1){
+		errorFlag=1;
+		printf("%s : %d : Nested Comment\n",sourceCode,lineCount);
+    }
 
     if(!errorFlag) {
-        printf("\n\n\t\t%s Parsing Completed\n\n", sourceCode);
-        printf("\t\tSuccessful parsing! %s has no syntax errors.\n\n",sourceCode);
+        printf("Successful parsing! %s has no syntax errors.\n",sourceCode);
 
         // Print parse tree
         FILE *parseTree = fopen("parsetree.txt", "w");
@@ -1033,15 +1543,24 @@ int main(int argc, char *argv[])
             printParseTree(root, 0, parseTree);
             fclose(parseTree);
         }
+    } else {
+        printf("\n%s Parsing Failed\n", sourceCode);
+        printf("Found %d syntax errors in %s\n", errorCount, sourceCode);
     }
+    
+    // Free the error list
+    while (errorList) {
+        ErrorInfo *temp = errorList;
+        errorList = errorList->next;
+        free(temp);
+    }
+    
     // Close the input file
     if (yyin) fclose(yyin);
+    if (yyerrfile) fclose(yyerrfile);
     
-    return 0;
+    return errorFlag; // Return error status
 }
 
-void yyerror(const char *s) {
-    errorFlag = 1;
-	fprintf(yyerrfile,"\n\t\t\t\tSyntax Errors\n\n");
-    fprintf(yyerrfile,"\n%s : %d : %s\n", sourceCode, lineCount, s);
-}
+
+

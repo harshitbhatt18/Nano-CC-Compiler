@@ -1,0 +1,8 @@
+Explanation  : 
+
+Semicolon missing
+
+Output:
+
+Invalid Syntax at line number 6
+Error near token: b

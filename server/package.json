@@ -7,7 +7,9 @@
     "start": "node index.js",
     "dev": "nodemon index.js",
     "clean": "rimraf lexical/*.exe lexical/*.c lexical/parseTable.txt error.txt output.exe",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "postinstall": "node -e \"require('child_process').exec('dot -V', (e, so, se) => {if(e){console.warn('WARNING: Graphviz (dot) is not installed. Please install it from https://graphviz.gitlab.io/download/');}})\"",
+    "prepare": "echo 'NOTE: This project requires Graphviz (dot) to be installed and available in your PATH.'"
   },
   "keywords": [
     "compiler",
@@ -29,5 +31,11 @@
   "devDependencies": {
     "nodemon": "^3.0.1",
     "rimraf": "^5.0.5"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "optionalDependencies": {
+    "graphviz": "*"
   }
 }

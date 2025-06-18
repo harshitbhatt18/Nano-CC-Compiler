@@ -1,10 +1,11 @@
 import React, { useState, useEffect} from 'react';
-import { Box, Typography, Button, Tab, Tabs, Paper } from '@mui/material';
+import { Box, Typography, Button, Tab, Tabs, Paper, Modal, IconButton } from '@mui/material';
 import Editor from '@monaco-editor/react';
 import axios from 'axios';
 import Terminal from '../components/Terminal';
 import { TabPanel } from '../components/TabPanel';
 import Navbar from '../components/Navbar';
+import CloseIcon from '@mui/icons-material/Close';
 
 
 const CompilerPage: React.FC = () => {
@@ -19,6 +20,11 @@ const CompilerPage: React.FC = () => {
   const [terminalHeight, setTerminalHeight] = useState('35%');
   const [formattedParseTable, setFormattedParseTable] = useState('');
   const [compilationId, setCompilationId] = useState<string | null>(null);
+  
+  const [syntaxResult, setSyntaxResult] = useState('');
+  const [formattedSyntax, setFormattedSyntax] = useState('');
+  const [parseTree, setParseTree] = useState('');
+  const [showParseTreeModal, setShowParseTreeModal] = useState(false);
 
   // Set stable heights on initial load
   useEffect(() => {
@@ -64,10 +70,7 @@ const CompilerPage: React.FC = () => {
       // Add table rows
       const lines = parseTable.split('\n').filter(line => line.trim());
       lines.forEach(line => {
-        // Skip headers or non-data lines
-        if (line.startsWith('lexme') || !line.includes('|')) {
-          return;
-        }
+        
         
         // Parse the line
         const parts = line.split(' | ');
@@ -91,11 +94,25 @@ const CompilerPage: React.FC = () => {
       result += '</table>';
       
       setFormattedParseTable(result);
+
     } catch (error) {
       console.error('Error formatting parse table:', error);
       setFormattedParseTable(`<pre>${parseTable}</pre>`);
     }
   }, [parseTable]);
+
+  useEffect(() => {
+    if (!syntaxResult) {
+      setFormattedSyntax('No syntax analysis data available');
+      return;
+    }
+    try{
+      setFormattedParseTable(syntaxResult);
+    }catch (error) {
+    console.error('Error :', error);
+    setFormattedSyntax(`<pre>${syntaxResult}</pre>`);
+  }
+  }, [syntaxResult]);
 
   // Helper function to escape HTML special characters
   const escapeHtml = (unsafe: string) => {
@@ -124,6 +141,7 @@ const CompilerPage: React.FC = () => {
       setParseTable(response.data.parseTable || 'No parse table data available');
       setSymbolTable(response.data.symbolTable || 'No symbol table data available');
       setConstantTable(response.data.constantTable || 'No constant table data available');
+      setParseTree(response.data.parseTree || 'No parse tree data available');
     } catch (error) {
       console.error('Compilation error:', error);
       setOutput('Error: Failed to communicate with the server.');
@@ -282,10 +300,62 @@ const CompilerPage: React.FC = () => {
             </TabPanel>
             
             <TabPanel value={tabValue} index={1}>
-              <Box component="pre" sx={{ p: 2, overflow: 'auto', height: 'calc(100vh - 180px)', bgcolor: '#1e1e1e', color: '#e0e0e0' }}>
-                {/* Placeholder for Syntax Phase */}
-                Syntax Phase Placeholder
+              <Box
+                sx={{
+                  p: 2,
+                  overflow: 'auto',
+                  height: 'calc(100vh - 180px)',
+                  bgcolor: '#1e1e1e',
+                  color: '#e0e0e0',
+                  fontFamily: 'monospace',
+                  whiteSpace: 'pre',
+                  wordBreak: 'break-word',
+                  tabSize: 4,
+                }}
+                component="pre"
+              >
+                {parseTree || 'No parse tree data available'}
+                <Box sx={{ mt: 3 }}>
+                  <Button variant="contained" color="secondary" onClick={() => setShowParseTreeModal(true)}>
+                    Show Parse Tree as Image
+                  </Button>
+                </Box>
               </Box>
+              <Modal
+                open={showParseTreeModal}
+                onClose={() => setShowParseTreeModal(false)}
+                sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+              >
+                <Box
+                  sx={{
+                    position: 'relative',
+                    width: '100vw',
+                    height: '100vh',
+                    bgcolor: 'rgba(0,0,0,0.95)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                >
+                  <IconButton
+                    onClick={() => setShowParseTreeModal(false)}
+                    sx={{ position: 'absolute', top: 16, right: 16, color: '#fff', zIndex: 10 }}
+                  >
+                    <CloseIcon fontSize="large" />
+                  </IconButton>
+                  <img
+                    src="http://localhost:5000/api/parsetree-image/parseTree.png"
+                    alt="Parse Tree"
+                    style={{
+                      maxWidth: '90vw',
+                      maxHeight: '90vh',
+                      borderRadius: 8,
+                      boxShadow: '0 0 24px #000',
+                      background: '#fff',
+                    }}
+                  />
+                </Box>
+              </Modal>
             </TabPanel>
             
             <TabPanel value={tabValue} index={2}>

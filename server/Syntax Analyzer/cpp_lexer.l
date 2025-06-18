@@ -14,8 +14,9 @@ void addToken(char *text) {
   strcpy(tablePtr, text);
 }
 
+/* Properly implement the makeList function */
 void makeList(char *t, char c, int l) {
-  /* Function to track tokens */
+  /* This is a placeholder implementation */
 }
 %}
 
@@ -28,7 +29,26 @@ void makeList(char *t, char c, int l) {
 "#include"[ \t]*\"[^\"]*\"    { addToken(yytext); makeList(yytext, 'd', lineCount); }
 
 "std::cout"   { addToken(yytext); makeList(yytext, 'v', lineCount); return IDENTIFIER; }
-"<<"          { addToken(yytext); makeList(yytext, 'o', lineCount); return LEFT_OP; }
+"std::cin"    { addToken(yytext); makeList(yytext, 'v', lineCount); return IDENTIFIER; }
+"std::cerr"   { addToken(yytext); makeList(yytext, 'v', lineCount); return IDENTIFIER; }
+"std::clog"   { addToken(yytext); makeList(yytext, 'v', lineCount); return IDENTIFIER; }
+
+"<<"     { addToken(yytext); makeList(yytext, 'o', lineCount); return LEFT_OP; }
+">>"     { addToken(yytext); makeList(yytext, 'o', lineCount); return RIGHT_OP; }
+
+"cout"   { addToken(yytext); makeList(yytext, 'v', lineCount); return IOSTREAM_OUT; }
+"cin"    { addToken(yytext); makeList(yytext, 'v', lineCount); return IOSTREAM_IN; }
+"cerr"   { addToken(yytext); makeList(yytext, 'v', lineCount); return IOSTREAM_OUT; }
+"clog"   { addToken(yytext); makeList(yytext, 'v', lineCount); return IOSTREAM_OUT; }
+
+"cinn"   { addToken(yytext); makeList(yytext, 'v', lineCount); return IOSTREAM_IN_MISSPELLED; }
+"cyn"    { addToken(yytext); makeList(yytext, 'v', lineCount); return IOSTREAM_IN_MISSPELLED; }
+"cine"   { addToken(yytext); makeList(yytext, 'v', lineCount); return IOSTREAM_IN_MISSPELLED; }
+"caut"   { addToken(yytext); makeList(yytext, 'v', lineCount); return IOSTREAM_OUT_MISSPELLED; }
+"coot"   { addToken(yytext); makeList(yytext, 'v', lineCount); return IOSTREAM_OUT_MISSPELLED; }
+"coute"  { addToken(yytext); makeList(yytext, 'v', lineCount); return IOSTREAM_OUT_MISSPELLED; }
+"cout_"  { addToken(yytext); makeList(yytext, 'v', lineCount); return IOSTREAM_OUT_MISSPELLED; }
+"cin_"   { addToken(yytext); makeList(yytext, 'v', lineCount); return IOSTREAM_IN_MISSPELLED; }
 
 "auto"    { addToken(yytext); makeList(yytext, 'k', lineCount); return AUTO; }
 "break"   { addToken(yytext); makeList(yytext, 'k', lineCount); return BREAK; }
@@ -94,8 +114,6 @@ void makeList(char *t, char c, int l) {
 "->"     { addToken(yytext); makeList(yytext, 'o', lineCount); return PTR_OP; }
 "++"     { addToken(yytext); makeList(yytext, 'o', lineCount); return INC_OP; }
 "--"     { addToken(yytext); makeList(yytext, 'o', lineCount); return DEC_OP; }
-"<<"     { addToken(yytext); makeList(yytext, 'o', lineCount); return LEFT_OP; }
-">>"     { addToken(yytext); makeList(yytext, 'o', lineCount); return RIGHT_OP; }
 "<="     { addToken(yytext); makeList(yytext, 'o', lineCount); return LE_OP; }
 ">="     { addToken(yytext); makeList(yytext, 'o', lineCount); return GE_OP; }
 "=="     { addToken(yytext); makeList(yytext, 'o', lineCount); return EQ_OP; }

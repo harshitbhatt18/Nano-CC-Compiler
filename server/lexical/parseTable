@@ -9,12 +9,23 @@ main                 | IDENTIFIER      | VAR             | 3
 (                    | PUNCTUATION     | LPAREN          | 3       
 )                    | PUNCTUATION     | RPAREN          | 3       
 {                    | PUNCTUATION     | LBRACE          | 3       
-printf               | IDENTIFIER      | VAR             | 4       
-(                    | PUNCTUATION     | LPAREN          | 4       
-"Hello, World!\n"    | STRING          | LITERAL         | 4       
-)                    | PUNCTUATION     | RPAREN          | 4       
+int                  | KEYWORD         | INT             | 4       
+a                    | IDENTIFIER      | VAR             | 4       
+=                    | OPERATOR        | ASSIGN          | 4       
+5                    | NUMBER          | INTEGER         | 4       
 ;                    | PUNCTUATION     | SEMICOLON       | 4       
-return               | KEYWORD         | RETURN          | 5       
-0                    | NUMBER          | INTEGER         | 5       
-;                    | PUNCTUATION     | SEMICOLON       | 5       
-}                    | PUNCTUATION     | RBRACE          | 6       
+if                   | KEYWORD         | IF              | 5       
+(                    | PUNCTUATION     | LPAREN          | 5       
+a                    | IDENTIFIER      | VAR             | 5       
+==                   | OPERATOR        | EQ              | 5       
+5                    | NUMBER          | INTEGER         | 5       
+)                    | PUNCTUATION     | RPAREN          | 5       
+printf               | IDENTIFIER      | VAR             | 6       
+(                    | PUNCTUATION     | LPAREN          | 6       
+"Hello, World!\n"    | STRING          | LITERAL         | 6       
+)                    | PUNCTUATION     | RPAREN          | 6       
+;                    | PUNCTUATION     | SEMICOLON       | 6       
+return               | KEYWORD         | RETURN          | 8       
+0                    | NUMBER          | INTEGER         | 8       
+;                    | PUNCTUATION     | SEMICOLON       | 8       
+}                    | PUNCTUATION     | RBRACE          | 9       

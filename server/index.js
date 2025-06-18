@@ -43,12 +43,12 @@ app.post('/api/compile', (req, res) => {
     let parseTable = '';
     let symbolTable = '';
     let constantTable = '';
+    let parseTree = '';
     
     const parseTablePath = path.join(lexicalDir, 'parseTable');
     try {
       if (fs.existsSync(parseTablePath)) {
         parseTable = fs.readFileSync(parseTablePath, 'utf8');
-        // console.log('Successfully read parseTable.txt. Content:', parseTable);
         if (!parseTable.trim()) {
           console.warn('parseTable.txt exists but is empty');
         }
@@ -70,9 +70,25 @@ app.post('/api/compile', (req, res) => {
     } catch (err) {
       console.error('Error reading constantTable:', err);
     }
-    
-    // Log the response data before sending
-    // console.log('Sending response with parseTable:', parseTable);
+
+    // Read the parse tree data
+    try {
+      const parseTreePath = path.join(__dirname, 'Syntax Analyzer', 'parsetree.txt');
+      if (fs.existsSync(parseTreePath)) {
+        // Read the file with UTF-8 encoding and preserve line endings
+        parseTree = fs.readFileSync(parseTreePath, { encoding: 'utf8', flag: 'r' });
+        if (!parseTree.trim()) {
+          console.warn('parsetree.txt exists but is empty');
+        } else {
+          // Ensure we preserve all whitespace and line endings
+          parseTree = parseTree.replace(/\r\n/g, '\n'); // Normalize line endings
+        }
+      } else {
+        console.error('parsetree.txt does not exist at:', parseTreePath);
+      }
+    } catch (err) {
+      console.error('Error reading parsetree.txt:', err);
+    }
     
     res.json({
       output,
@@ -80,6 +96,7 @@ app.post('/api/compile', (req, res) => {
       parseTable,
       symbolTable,
       constantTable,
+      parseTree
     });
   });
 });
@@ -91,6 +108,9 @@ app.post('/api/input', (req, res) => {
   // Will need to be expanded based on how you implement the actual process communication
   res.json({ success: true });
 });
+
+const syntaxAnalyzerDir = path.join(__dirname, 'Syntax Analyzer');
+app.use('/api/parsetree-image', express.static(syntaxAnalyzerDir));
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
