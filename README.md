@@ -37,6 +37,7 @@ nano-cc-compiler/
 - Node.js (v14 or higher)
 - npm (v6 or higher)
 - GCC compiler (for actually compiling C/C++ code)
+- Graphviz (for creating graphs)
 
 ### Installation
 
