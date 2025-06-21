@@ -1,8 +1,0 @@
-Eplanation :
-
-There is an unbalanced else in line number 12 ,ie there should be else for each if statements
-
-Output: 
-
-Syntax Error at line 12
-Error near token: "\n a is smaller than b"

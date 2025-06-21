@@ -1,8 +1,0 @@
-Explanation :
-
-After cout only one < is written it should be <<
-
-Output :
-
-Invalid Syntax at line number at 7
-Error near token: <

@@ -108,7 +108,7 @@ void appendType(const char* additional) {
 
 void makeList(char *,char,int);
 int yylex(void);
-int yyerror(const char *s);
+void yyerror(const char *s);
 
 
 // Function to check variable declarations
@@ -920,7 +920,7 @@ function_definition
 	;
 
 %%
-void yyerror()
+void yyerror(const char *s)
 {
 	errorFlag = 1;
 	fflush(stdout);
@@ -994,7 +994,7 @@ int main(int argc,char **argv){
 
 	// Generate output tables if no errors
 	if(!errorFlag){
-		printf("Successful parsing! %s has no syntax errors.\n",sourceCode);
+		printf("Successful parsing! No syntax error found.\n");
 	}
 	FILE *ptree = fopen("parsetree.txt", "w");
 	if (ptree) {
@@ -1140,10 +1140,5 @@ void makeList(char *tokenName, char tokenType, int tokenLine)
             tail->next = vtemp;
         }
     }
-}
-
-int  yyerror(const char *s) {
-    fprintf(stderr, "Error: %s\n", s);
-	return 1;
 }
 

@@ -1,0 +1,4 @@
+lexical\input.cc: In function 'int main()':
+lexical\input.cc:9:13: error: expected ';' before ')' token
+  for(a<l;a++){
+             ^

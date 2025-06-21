@@ -1,9 +1,16 @@
-#include <stdio.h>
+// Testcase to check  looping statements 
+#include<stdio.h>
+int main(){
 
-int main() {
-    int a=5;
-    if(a==5)
-        printf("Hello, World!\n");
-    
-    return 0;
+	int l=10,a=0,i;
+	for(i=0;i<l;i++){
+		printf("\nHello World");
+	}
+	for(a<l;a++){
+		printf("\nInvalid Syntax");
+	}
+	while(i<10){
+		printf("\nCompiler Design");
+	}
+	
 }

@@ -37,18 +37,19 @@ nano-cc-compiler/
 - Node.js (v14 or higher)
 - npm (v6 or higher)
 - GCC compiler (for actually compiling C/C++ code)
+- Graphviz (for creating graphs)
 
 ### Installation
 
 1. Clone the repository:
    ```
-   git clone <repository-url>
+   git clone https://github.com/SanchitNegi177/Nano-CC-Compiler-NEW
    cd nano-cc-compiler
    ```
 
 2. Install dependencies:
    ```
-   npm run install
+   npm run install:all
    ```
    This will install dependencies for both client and server.
 
@@ -63,7 +64,7 @@ nano-cc-compiler/
 ### Windows Compatibility Note
 
 For Windows users:
-- The application uses both .bat and .ps1 files for running the compiler process
+- The application uses both .bat file for running the compiler process
 - If you encounter issues, make sure you have GCC installed and added to your PATH
 - You can use MinGW, Cygwin, or the GCC that comes with Windows Subsystem for Linux (WSL)
 

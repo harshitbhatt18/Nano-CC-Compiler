@@ -1535,7 +1535,7 @@ int main(int argc, char *argv[])
     }
 
     if(!errorFlag) {
-        printf("Successful parsing! %s has no syntax errors.\n",sourceCode);
+        printf("Successful parsing! No syntax error found.\n");
 
         // Print parse tree
         FILE *parseTree = fopen("parsetree.txt", "w");
@@ -1544,7 +1544,7 @@ int main(int argc, char *argv[])
             fclose(parseTree);
         }
     } else {
-        printf("\n%s Parsing Failed\n", sourceCode);
+        
         printf("Found %d syntax errors in %s\n", errorCount, sourceCode);
     }
     

@@ -1,5 +1,7 @@
 @echo off
 echo Compiling input.cc...
+echo -----------------------------------------------------------------------------------------
+
 
 :: Set the lexical directory path
 set LEXICAL_DIR=lexical
@@ -29,12 +31,16 @@ if %ERRORLEVEL% EQU 0 (
     )
 
     :: Run the shell script from Syntax Analyzer
+    echo -----------------------------------------------------------------------------------------
+
     echo Running Syntax Analyzer with Bison...
-    copy /Y lexical\input.cc "Syntax Analyzer\input.cc"
+    copy /Y lexical\input.cc "Syntax Analyzer\input.cc">nul
     "C:\Program Files\Git\bin\sh.exe" "Syntax Analyzer/compile.sh"
 
+    echo -----------------------------------------------------------------------------------------
+
 ) else (
-    echo Lex not found. 
+    echo Lex and bison not found. 
   
 )
 
@@ -52,5 +58,5 @@ if %COMPILE_ERROR% EQU 0 (
 ) else (
     echo Compilation failed with errors:
     type error.txt
-    del error.txt
+    @REM del error.txt
 ) 

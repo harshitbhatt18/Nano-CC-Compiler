@@ -1,7 +1,0 @@
-Explanation:
-Cannot use two arithmetic operator consecutivley hence error at line 12
-
-Output:
-
-Syntax error at line 12
-Error near token: c
