@@ -14,6 +14,6 @@ lex lexicalAnalyzer.l
 win_bison -d syntaxChecker.y
 g++ lex.yy.c syntaxChecker.tab.c -w -g
 ./a.exe "$INPUT_FILE"
-rm syntaxChecker.tab.c syntaxChecker.tab.h lex.yy.c
+rm syntaxChecker.tab.c syntaxChecker.tab.h lex.yy.c 
 
 cd ..

@@ -1,8 +1,5 @@
 Identifier           | Line Nos                      
-c                    | 11
-fun                  | 9
-printf               | 6
-a                    | 4, 5
+printf               | 4
 main                 | 3
 h                    | 1
 stdio                | 1

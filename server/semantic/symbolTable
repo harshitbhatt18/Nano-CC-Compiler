@@ -1,5 +1,2 @@
 Lexeme           | Type         | Line No  | Scope    | Func No 
 main             | INT          |  3       | GLOBAL   | 1       
-a                | INT          |  4 5     | NESTING  | 1       
-fun              | VOID         |  9       | GLOBAL   | 2       
-c                | INT          |  11      | NESTING  | 2       
