@@ -107,6 +107,9 @@ void appendType(const char* additional) {
 }
 
 void makeList(char *,char,int);
+int yylex(void);
+void yyerror(const char *s);
+
 
 // Function to check variable declarations
 void checkDeclaration(char *name, int line, int scope) {
@@ -877,11 +880,15 @@ external_declaration
 
 function_definition
 	: declaration_specifiers declarator declaration_list compound_statement { 
-		$$ = createNode("function_definition", $1, createNode("decl_list", $3, $4)); 
+		$$ = createNode("function_definition", $1, createNode("func_decl", $2, createNode("decl_list", $3, $4))); 
+		
 		// Check for type mismatches with previous declarations
 		FunctionDecl *decl = findFunctionDeclaration(currentFunctionName);
 		if (decl) {
+		    // Compare parameter types
 		    if (strcmp(typeBuffer, "char") == 0 && currentParamIndex > 0) {
+		        // We're processing a char parameter
+		        // Check if it was declared as a different type
 		        if (strcmp(decl->paramTypes[currentParamIndex-1], "int") == 0) {
 		            errorFlag = 1;
                     printf("\n%s : %d : Type Error: Parameter type mismatch in function '%s'\n", 
@@ -893,10 +900,13 @@ function_definition
 		}
 	}
 	| declaration_specifiers declarator compound_statement { 
-		$$ = createNode("function_definition", $1, $3);
-		if (strcmp(currentFunctionName, "sum") == 0 && strcmp(typeBuffer, "char") == 0) {
+		$$ = createNode("function_definition", $1, createNode("func_decl", $2, $3));
+		
+		// If this is the function 'sum', check for special cases
+        if (strcmp(currentFunctionName, "sum") == 0 && strcmp(typeBuffer, "char") == 0) {
             FunctionDecl *decl = findFunctionDeclaration("sum");
             if (decl) {
+                // We found a previous declaration of sum
                 errorFlag = 1;
                 printf("\n%s : %d : Type Error: Function implementation parameter type mismatch\n", 
                        sourceCode, lineCount);
@@ -910,12 +920,12 @@ function_definition
 	;
 
 %%
-void yyerror()
+void yyerror(const char *s)
 {
 	errorFlag = 1;
 	fflush(stdout);
 	
-	fprintf(yyerrfile, "\n\t\t\t\tSyntax Errors\n\n");
+	fprintf(yyerrfile, "\nSyntax Errors\n");
 	fprintf(yyerrfile, "\n%s : %d : Syntax Error\n", sourceCode, lineCount);
 	if (tablePtr) {
 		fprintf(yyerrfile, "Error near token: %s\n", tablePtr);
@@ -932,7 +942,7 @@ void yyerror()
 		printf("Error: Unexpected token or end of input\n");
 	}
 }
-void main(int argc,char **argv){
+int main(int argc,char **argv){
 	if(argc<=1){
 		printf("Invalid ,Expected Format : ./a.out <\"sourceCode\"> \n");
 		return 0;
@@ -945,14 +955,14 @@ void main(int argc,char **argv){
 	yyerrfile = fopen("syntaxErrors.txt", "w");
 	if (!yyerrfile) {
 		printf("Error: Could not open syntaxErrors.txt for writing\n");
-		return;
+		return 0;
 	}
 	
 	yyin=fopen(argv[1],"r");
 	if (!yyin) {
 		printf("Error: Could not open file %s\n", argv[1]);
 		fclose(yyerrfile);
-		return;
+		return 0;
 	}
 	
 	sourceCode=(char *)malloc(strlen(argv[1])*sizeof(char));
@@ -984,7 +994,7 @@ void main(int argc,char **argv){
 
 	// Generate output tables if no errors
 	if(!errorFlag){
-		printf("Successful Parsing! This code has no syntax errors.\n");
+		printf("Successful parsing! No syntax error found.\n");
 	}
 	FILE *ptree = fopen("parsetree.txt", "w");
 	if (ptree) {
@@ -994,134 +1004,141 @@ void main(int argc,char **argv){
 	// Close input file
 	fclose(yyin);
 	fclose(yyerrfile);
+
+	return 0;
 }
 
-void makeList(char *tokenName,char tokenType, int tokenLine)
+void makeList(char *tokenName, char tokenType, int tokenLine)
 {
-	char line[39],lineBuffer[19];
-	
-  	snprintf(lineBuffer, 19, "%d", tokenLine);
-	strcpy(line," ");
-	strcat(line,lineBuffer);
-	char type[20];
-	switch(tokenType)
-	{
-			case 'c':
-					strcpy(type,"Constant");
-					break;
-			case 'v':
-					strcpy(type,"Identifier");
-					break;
-			case 'p':
-					strcpy(type,"Punctuator");
-					break;
-			case 'o':
-					strcpy(type,"Operator");
-					break;
-			case 'k':
-					strcpy(type,"Keyword");
-					break;
-			case 's':
-					strcpy(type,"String Literal");		
-					break;
-			case 'd':
-					strcpy(type,"Preprocessor Statement");
-					break;
-	}
-	for(tokenList *p=parsedPtr;p!=NULL;p=p->next)
-  	 		if(strcmp(p->token,tokenName)==0){
-       				strcat(p->line,line);
-       				goto xx;
-     			}
-		tokenList *temp=(tokenList *)malloc(sizeof(tokenList));
-		temp->token=(char *)malloc(strlen(tokenName)+1);
-		strcpy(temp->token,tokenName);
-		strcpy(temp->type,type);
-    		strcpy(temp->line,line);
-    		temp->next=NULL;
-    		
-    		tokenList *p=parsedPtr;
-    		if(p==NULL){
-    			
-    			parsedPtr=temp;
-    		}
-    		else{
-    			while(p->next!=NULL){
-    				p=p->next;
-    			}
-    			p->next=temp;
-    		}	
-    		
-	
-	xx:
-	if(tokenType == 'c')
-	{
-    		// Check if this constant is already in the table
-    		for(tokenList *p=constantPtr;p!=NULL;p=p->next)
-  	 		if(strcmp(p->token,tokenName)==0){
-       				strcat(p->line,line);
-       				return;
-     			}
-     			
-		tokenList *temp=(tokenList *)malloc(sizeof(tokenList));
-		temp->token=(char *)malloc(strlen(tokenName)+1);
-		strcpy(temp->token,tokenName);
-		
-		// Determine constant type
-		if (strchr(tokenName, '.') != NULL) {
-			strcpy(temp->type, "float");
-		} else if (tokenName[0] == '\'' && tokenName[strlen(tokenName)-1] == '\'') {
-			strcpy(temp->type, "char");
-		} else if (tokenName[0] == '0' && (tokenName[1] == 'x' || tokenName[1] == 'X')) {
-			strcpy(temp->type, "hex");
-		} else if (tokenName[0] == '0' && isdigit(tokenName[1])) {
-			strcpy(temp->type, "octal");
-		} else if (isdigit(tokenName[0])) {
-			strcpy(temp->type, "int");
-		} else {
-			strcpy(temp->type, "unknown");
-		}
-		
-    		strcpy(temp->line,line);
-    		temp->next=NULL;
-    		
-    		tokenList *p=constantPtr;
-    		if(p==NULL){
-    			constantPtr=temp;
-    		}
-    		else{
-    			while(p->next!=NULL){
-    				p=p->next;
-    			}
-    			p->next=temp;
-    		}	
-	}
-	if(tokenType=='v')
-	{
-    		for(tokenList *p=symbolPtr;p!=NULL;p=p->next)
-  	 		if(strcmp(p->token,tokenName)==0){
-       				strcat(p->line,line);
-       				return;
-     			}
-		tokenList *temp=(tokenList *)malloc(sizeof(tokenList));
-		temp->token=(char *)malloc(strlen(tokenName)+1);
-		strcpy(temp->token,tokenName);
-		
-		// Simply copy the current type directly from typeBuffer (now a string)
-		strcpy(temp->type, typeBuffer);
-		
-    		strcpy(temp->line,line);
-    		temp->next=NULL;
-    		tokenList *p=symbolPtr;
-    		if(p==NULL){
-    			
-    			symbolPtr=temp;
-    		}
-    		else{
-    			while(p->next!=NULL){
-    				p=p->next;
-    			}
-    			p->next=temp;
-    		}
-	}
+    char line[39], lineBuffer[19];
+    snprintf(lineBuffer, sizeof(lineBuffer), "%d", tokenLine);
+    strcpy(line, " ");
+    strcat(line, lineBuffer);
+
+    char type[20];
+    switch (tokenType)
+    {
+        case 'c': strcpy(type, "Constant"); break;
+        case 'v': strcpy(type, "Identifier"); break;
+        case 'p': strcpy(type, "Punctuator"); break;
+        case 'o': strcpy(type, "Operator"); break;
+        case 'k': strcpy(type, "Keyword"); break;
+        case 's': strcpy(type, "String Literal"); break;
+        case 'd': strcpy(type, "Preprocessor Statement"); break;
+        default: strcpy(type, "Unknown"); break;
+    }
+
+    // Check and update if token already exists in parsedPtr
+    tokenList *p = parsedPtr;
+    int foundInParsed = 0;
+    while (p != NULL)
+    {
+        if (strcmp(p->token, tokenName) == 0)
+        {
+            strcat(p->line, line);
+            foundInParsed = 1;
+            break;
+        }
+        p = p->next;
+    }
+
+    // If not found, add to parsedPtr
+    if (!foundInParsed)
+    {
+        tokenList *temp = (tokenList *)malloc(sizeof(tokenList));
+        temp->token = (char *)malloc(strlen(tokenName) + 1);
+        strcpy(temp->token, tokenName);
+        strcpy(temp->type, type);
+        strcpy(temp->line, line);
+        temp->next = NULL;
+
+        if (parsedPtr == NULL)
+            parsedPtr = temp;
+        else
+        {
+            tokenList *tail = parsedPtr;
+            while (tail->next != NULL)
+                tail = tail->next;
+            tail->next = temp;
+        }
+    }
+
+    // If token is constant
+    if (tokenType == 'c')
+    {
+        tokenList *cp = constantPtr;
+        while (cp != NULL)
+        {
+            if (strcmp(cp->token, tokenName) == 0)
+            {
+                strcat(cp->line, line);
+                return;
+            }
+            cp = cp->next;
+        }
+
+        tokenList *ctemp = (tokenList *)malloc(sizeof(tokenList));
+        ctemp->token = (char *)malloc(strlen(tokenName) + 1);
+        strcpy(ctemp->token, tokenName);
+
+        // Determine constant type
+        if (strchr(tokenName, '.') != NULL)
+            strcpy(ctemp->type, "float");
+        else if (tokenName[0] == '\'' && tokenName[strlen(tokenName) - 1] == '\'')
+            strcpy(ctemp->type, "char");
+        else if (tokenName[0] == '0' && (tokenName[1] == 'x' || tokenName[1] == 'X'))
+            strcpy(ctemp->type, "hex");
+        else if (tokenName[0] == '0' && isdigit(tokenName[1]))
+            strcpy(ctemp->type, "octal");
+        else if (isdigit(tokenName[0]))
+            strcpy(ctemp->type, "int");
+        else
+            strcpy(ctemp->type, "unknown");
+
+        strcpy(ctemp->line, line);
+        ctemp->next = NULL;
+
+        if (constantPtr == NULL)
+            constantPtr = ctemp;
+        else
+        {
+            tokenList *tail = constantPtr;
+            while (tail->next != NULL)
+                tail = tail->next;
+            tail->next = ctemp;
+        }
+    }
+
+    // If token is identifier
+    if (tokenType == 'v')
+    {
+        tokenList *sp = symbolPtr;
+        while (sp != NULL)
+        {
+            if (strcmp(sp->token, tokenName) == 0)
+            {
+                strcat(sp->line, line);
+                return;
+            }
+            sp = sp->next;
+        }
+
+        tokenList *vtemp = (tokenList *)malloc(sizeof(tokenList));
+        vtemp->token = (char *)malloc(strlen(tokenName) + 1);
+        strcpy(vtemp->token, tokenName);
+        strcpy(vtemp->type, typeBuffer); // use type from global buffer
+        strcpy(vtemp->line, line);
+        vtemp->next = NULL;
+
+        if (symbolPtr == NULL)
+            symbolPtr = vtemp;
+        else
+        {
+            tokenList *tail = symbolPtr;
+            while (tail->next != NULL)
+                tail = tail->next;
+            tail->next = vtemp;
+        }
+    }
 }
+
