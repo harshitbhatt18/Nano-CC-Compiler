@@ -1,0 +1,11 @@
+translation_unit
+  function_definition
+    int
+  block
+    block_items
+      expr_stmt
+        call(args)
+          IDENTIFIER
+        STRING_LITERAL
+    return
+      CONSTANT

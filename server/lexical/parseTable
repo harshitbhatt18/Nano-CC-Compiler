@@ -13,6 +13,7 @@ printf               | IDENTIFIER      | VAR             | 4
 (                    | PUNCTUATION     | LPAREN          | 4       
 "Welcome to Nano CC Compiler" | STRING          | LITERAL         | 4       
 )                    | PUNCTUATION     | RPAREN          | 4       
+;                    | PUNCTUATION     | SEMICOLON       | 4       
 return               | KEYWORD         | RETURN          | 5       
 0                    | NUMBER          | INTEGER         | 5       
 ;                    | PUNCTUATION     | SEMICOLON       | 5       

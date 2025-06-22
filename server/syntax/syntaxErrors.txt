@@ -1,7 +1,0 @@
-
-				Syntax Errors
-
-
-../lexical/input.cc : 5 : Syntax Error
-Error near token: "Welcome to Nano CC Compiler"
-Context: Expression or statement
