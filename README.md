@@ -21,9 +21,9 @@ nano-cc-compiler/
 │   └── package.json   # Frontend dependencies
 ├── server/            # Node.js backend
 │   ├── lexical/       # Lexical analysis implementation
-│   ├── Syntax/        # Syntax analysis implementation
+│   ├── syntax/        # Syntax analysis implementation
+|   ├── semantic/      # Semantic analysis implementation
 │   ├── compiler.bat   # Windows batch script for compilation
-│   ├── compiler.ps1   # PowerShell script for compilation
 │   ├── index.js       # Express server
 │   └── package.json   # Backend dependencies
 ├── start.bat          # Windows startup script
@@ -37,6 +37,8 @@ nano-cc-compiler/
 - Node.js (v14 or higher)
 - npm (v6 or higher)
 - GCC compiler (for actually compiling C/C++ code)
+- lex (for lexical analysis)
+- win_bison (for syntax and semantic analysis)
 - Graphviz (for creating graphs)
 
 ### Installation
@@ -64,9 +66,9 @@ nano-cc-compiler/
 ### Windows Compatibility Note
 
 For Windows users:
-- The application uses both .bat file for running the compiler process
+- The application uses a .bat file for running the compiler process
 - If you encounter issues, make sure you have GCC installed and added to your PATH
-- You can use MinGW, Cygwin, or the GCC that comes with Windows Subsystem for Linux (WSL)
+- If you encounter an issue, make sure you have renamed your 'win_flex.exe' to 'lex.exe'. 
 
 ## How It Works
 
@@ -74,15 +76,14 @@ For Windows users:
 2. Code is sent to the Node.js backend
 3. Backend processes the code through multiple phases:
    - Lexical analysis (token generation)
-   - Syntax analysis (parse table generation)
-   - Semantic analysis
+   - Syntax analysis (parse tree generation)
+   - Semantic analysis (Verified AST)
 4. Results are sent back to the frontend and displayed
 5. The compiled program can be executed and its output viewed in the terminal
 
 ## Future Plans
 
 - Implement full Lex/Yacc integration
-- Add syntax tree visualization
 - Support for more C/C++ language features
 - Better error handling and debugging tools
 - Integration with LLVM for better code generation
