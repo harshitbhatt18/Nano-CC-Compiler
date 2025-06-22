@@ -43,7 +43,7 @@ nano-cc-compiler/
 
 1. Clone the repository:
    ```
-   git clone https://github.com/SanchitNegi177/Nano-CC-Compiler-NEW
+   git clone https://github.com/SanchitNegi177/Nano-CC-Compiler.git
    cd nano-cc-compiler
    ```
 
