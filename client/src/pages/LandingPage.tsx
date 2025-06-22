@@ -18,7 +18,7 @@ const LandingPage: React.FC = () => {
       display: 'flex', 
       flexDirection: 'column', 
       minHeight: '100vh',
-      bgcolor: '#F8F9FF'
+      background: 'linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%)',
     }}>
       <Navbar />
 
@@ -26,43 +26,48 @@ const LandingPage: React.FC = () => {
       <Box 
         sx={{
           textAlign: 'center',
-          pt: { xs: 4, sm: 6 },
-          pb: { xs: 6, sm: 8 },
-          backgroundImage: 'linear-gradient(135deg, #E1E7FF 0%, #C1CCFF 100%)',
-          borderRadius: '16px',
+          pt: { xs: 6, sm: 8 },
+          pb: { xs: 8, sm: 10 },
+          background: 'linear-gradient(135deg, rgba(124, 58, 237, 0.1) 0%, rgba(6, 182, 212, 0.1) 100%)',
+          borderRadius: '20px',
           position: 'relative',
           overflow: 'hidden',
-          mb: { xs: 4, sm: 6 },
+          mb: { xs: 6, sm: 8 },
           mx: { xs: 2, sm: 4 },
           mt: { xs: 2, sm: 4 },
-          boxShadow: '0 10px 40px rgba(47, 75, 191, 0.15)'
+          border: '1px solid rgba(124, 58, 237, 0.2)',
+          backdropFilter: 'blur(20px)',
+          boxShadow: '0 20px 60px rgba(0, 0, 0, 0.4)',
         }}
       >
-        <Box 
-          sx={{ 
-            position: 'absolute', 
-            width: '200px', 
-            height: '200px', 
-            borderRadius: '50%', 
-            background: 'radial-gradient(circle, rgba(154, 173, 249, 0.6) 0%, rgba(154, 173, 249, 0) 70%)',
-            top: '20px',
-            right: '10%',
-            zIndex: 0,
-            display: { xs: 'none', sm: 'block' }
-          }} 
-        />
-
+        {/* Animated background elements */}
         <Box 
           sx={{ 
             position: 'absolute', 
             width: '300px', 
             height: '300px', 
             borderRadius: '50%', 
-            background: 'radial-gradient(circle, rgba(90, 124, 255, 0.4) 0%, rgba(90, 124, 255, 0) 70%)',
-            bottom: '-100px',
+            background: 'radial-gradient(circle, rgba(124, 58, 237, 0.3) 0%, rgba(124, 58, 237, 0) 70%)',
+            top: '-50px',
+            right: '10%',
+            zIndex: 0,
+            display: { xs: 'none', sm: 'block' },
+            animation: 'pulse 4s infinite ease-in-out',
+          }} 
+        />
+
+        <Box 
+          sx={{ 
+            position: 'absolute', 
+            width: '400px', 
+            height: '400px', 
+            borderRadius: '50%', 
+            background: 'radial-gradient(circle, rgba(6, 182, 212, 0.2) 0%, rgba(6, 182, 212, 0) 70%)',
+            bottom: '-150px',
             left: '5%',
             zIndex: 0,
-            display: { xs: 'none', sm: 'block' }
+            display: { xs: 'none', sm: 'block' },
+            animation: 'pulse 6s infinite ease-in-out',
           }} 
         />
         
@@ -70,23 +75,31 @@ const LandingPage: React.FC = () => {
           <Typography 
             variant="h2" 
             component="h1" 
+            className="animate-fade-in-up"
             sx={{ 
-              mb: 2, 
-              color: '#1D3080',
+              mb: 3, 
+              background: 'linear-gradient(135deg, #f1f5f9 0%, #94a3b8 100%)',
+              backgroundClip: 'text',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
               fontWeight: 800,
-              fontSize: { xs: '2rem', sm: '3rem', md: '3.75rem' }
+              fontSize: { xs: '2.5rem', sm: '3.5rem', md: '4rem' },
+              textShadow: '0 4px 20px rgba(124, 58, 237, 0.3)',
             }}
           >
             Nano CC Compiler
           </Typography>
           <Typography 
             variant="h6" 
+            className="animate-fade-in-up"
             sx={{ 
-              mb: 4, 
-              color: '#435180',
+              mb: 5, 
+              color: '#94a3b8',
               maxWidth: '700px',
               mx: 'auto',
-              fontSize: { xs: '1rem', sm: '1.25rem', md: '1.5rem' }
+              fontSize: { xs: '1.1rem', sm: '1.3rem', md: '1.5rem' },
+              lineHeight: 1.6,
+              fontWeight: 500,
             }}
           >
             Explore and understand the three phases of compilation
@@ -96,14 +109,21 @@ const LandingPage: React.FC = () => {
             variant="contained" 
             size="large"
             onClick={() => navigate('/compiler')}
+            className="animate-fade-in-up"
             sx={{
-              bgcolor: '1D3080',
-              py: { xs: 1, sm: 1.5 },
-              px: { xs: 3, sm: 4 },
-              fontSize: { xs: '0.9rem', sm: '1.1rem' },
-              boxShadow: '0 8px 20px rgba(47, 75, 191, 0.35)',
+              background: 'linear-gradient(135deg, #7c3aed 0%, #a855f7 100%)',
+              py: { xs: 1.5, sm: 2 },
+              px: { xs: 4, sm: 6 },
+              fontSize: { xs: '1rem', sm: '1.2rem' },
+              fontWeight: 600,
+              borderRadius: '12px',
+              boxShadow: '0 8px 30px rgba(124, 58, 237, 0.4)',
+              border: '1px solid rgba(168, 85, 247, 0.5)',
+              transition: 'all 0.3s ease',
               '&:hover': {
-                bgcolor: '#5A7CFF'
+                background: 'linear-gradient(135deg, #6d28d9 0%, #9333ea 100%)',
+                transform: 'translateY(-3px)',
+                boxShadow: '0 12px 40px rgba(124, 58, 237, 0.6)',
               }
             }}
           >
@@ -113,16 +133,20 @@ const LandingPage: React.FC = () => {
       </Box>
 
       {/* Features Section */}
-      <Container maxWidth="lg" sx={{ mb: 6 }}>
+      <Container maxWidth="lg" sx={{ mb: 8 }}>
         <Typography 
           variant="h4" 
           component="h3" 
+          className="animate-fade-in-up"
           sx={{ 
-            mb: 4, 
+            mb: 6, 
             textAlign: 'center', 
             fontWeight: 700,
-            color: '#1F2A4B',
-            fontSize: { xs: '1.5rem', sm: '2rem', md: '2.125rem' }
+            background: 'linear-gradient(135deg, #f1f5f9 0%, #94a3b8 100%)',
+            backgroundClip: 'text',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            fontSize: { xs: '1.8rem', sm: '2.2rem', md: '2.5rem' }
           }}
         >
           Compiler Phases
@@ -130,72 +154,94 @@ const LandingPage: React.FC = () => {
         <Box sx={{ 
           display: 'flex', 
           flexWrap: 'wrap', 
-          gap: { xs: 2, sm: 4 }, 
+          gap: { xs: 3, sm: 4 }, 
           justifyContent: 'center'
         }}>
           {[
             {
               phase: '1',
               title: 'Lexical Analysis',
-              color: '#5A7CFF',
-              description: 'View the tokenization process in real-time. See how your code is broken down into lexemes, with detailed token information and line numbers.'
+              gradient: 'linear-gradient(135deg, #7c3aed 0%, #a855f7 100%)',
+              description: 'View the tokenization process in real-time. See how your code is broken down into lexemes, with detailed token information and line numbers.',
+              shadow: 'rgba(124, 58, 237, 0.4)'
             },
             {
               phase: '2',
               title: 'Syntax Analysis',
-              color: '#42DDFF',
-              description: 'Understand the parsing process and syntax validation. Visualize how your code conforms to C language grammar rules.'
+              gradient: 'linear-gradient(135deg, #06b6d4 0%, #67e8f9 100%)',
+              description: 'Understand the parsing process and syntax validation. Visualize how your code conforms to C language grammar rules.',
+              shadow: 'rgba(6, 182, 212, 0.4)'
             },
             {
               phase: '3',
               title: 'Semantic Analysis',
-              color: '#9FAEF0',
-              description: 'Explore symbol tables and constant tables. Track variable declarations, scope, and type checking in your code.'
+              gradient: 'linear-gradient(135deg, #8b5cf6 0%, #c084fc 100%)',
+              description: 'Explore symbol tables and constant tables. Track variable declarations, scope, and type checking in your code.',
+              shadow: 'rgba(139, 92, 246, 0.4)'
             }
-          ].map((item) => (
-            <Card key={item.phase} sx={{ 
-              flex: '1 1 300px',
-              maxWidth: '350px',
-              p: 3,
-              borderRadius: '12px',
-              bgcolor: 'white',
-              boxShadow: '0 6px 20px rgba(47, 75, 191, 0.08)',
-              transition: 'transform 0.3s ease, box-shadow 0.3s ease',
-              border: '1px solid rgba(159, 174, 240, 0.3)',
+          ].map((item, index) => (
+            <Card key={item.phase} className="animate-fade-in-up" sx={{ 
+              flex: '1 1 320px',
+              maxWidth: '380px',
+              p: 4,
+              borderRadius: '16px',
+              background: 'linear-gradient(135deg, rgba(26, 26, 46, 0.8) 0%, rgba(22, 33, 62, 0.8) 100%)',
+              backdropFilter: 'blur(20px)',
+              border: '1px solid rgba(124, 58, 237, 0.2)',
+              transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+              position: 'relative',
+              overflow: 'hidden',
               '&:hover': {
-                transform: 'translateY(-8px)',
-                boxShadow: '0 12px 30px rgba(47, 75, 191, 0.15)',
-              }
+                transform: 'translateY(-8px) scale(1.02)',
+                boxShadow: `0 20px 40px ${item.shadow}`,
+                borderColor: 'rgba(124, 58, 237, 0.4)',
+              },
+              '&::before': {
+                content: '""',
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                height: '4px',
+                background: item.gradient,
+                borderRadius: '16px 16px 0 0',
+              },
+              animationDelay: `${index * 0.2}s`,
             }}>
               <Box 
                 sx={{ 
-                  width: { xs: '40px', sm: '48px' },
-                  height: { xs: '40px', sm: '48px' },
-                  borderRadius: '10px',
-                  bgcolor: item.color,
-                  mb: 2.5,
+                  width: { xs: '48px', sm: '56px' },
+                  height: { xs: '48px', sm: '56px' },
+                  borderRadius: '14px',
+                  background: item.gradient,
+                  mb: 3,
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                   color: 'white',
                   fontWeight: 'bold',
-                  fontSize: { xs: '1.2rem', sm: '1.4rem' },
-                  boxShadow: `0 6px 15px ${item.color}40`
+                  fontSize: { xs: '1.4rem', sm: '1.6rem' },
+                  boxShadow: `0 8px 20px ${item.shadow}`,
+                  transition: 'all 0.3s ease',
+                  '&:hover': {
+                    transform: 'scale(1.1) rotate(5deg)',
+                  }
                 }}
               >
                 {item.phase}
               </Box>
               <Typography variant="h6" sx={{ 
                 fontWeight: 600,
-                color: '#1F2A4B',
-                mb: 1.5,
-                fontSize: { xs: '1rem', sm: '1.25rem' }
+                color: '#f1f5f9',
+                mb: 2,
+                fontSize: { xs: '1.1rem', sm: '1.3rem' }
               }}>
                 {item.title}
               </Typography>
               <Typography variant="body1" sx={{ 
-                color: '#435180',
-                fontSize: { xs: '0.875rem', sm: '1rem' }
+                color: '#94a3b8',
+                fontSize: { xs: '0.9rem', sm: '1rem' },
+                lineHeight: 1.7,
               }}>
                 {item.description}
               </Typography>

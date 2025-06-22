@@ -10,6 +10,7 @@ edge [fontname="Arial"];
   node1 -> node4;
   node5 [label="block_items"];
   node4 -> node5;
+<<<<<<< HEAD
   node6 [label="declaration"];
   node5 -> node6;
   node7 [label="int"];
@@ -38,4 +39,18 @@ edge [fontname="Arial"];
   node4 -> node18;
   node19 [label="CONSTANT"];
   node18 -> node19;
+=======
+  node6 [label="expr_stmt"];
+  node5 -> node6;
+  node7 [label="call(args)"];
+  node6 -> node7;
+  node8 [label="IDENTIFIER"];
+  node7 -> node8;
+  node9 [label="STRING_LITERAL"];
+  node6 -> node9;
+  node10 [label="return"];
+  node4 -> node10;
+  node11 [label="CONSTANT"];
+  node10 -> node11;
+>>>>>>> 2cc9956d29f0e3962e23567a7ff2e21d8aed2e54
 }

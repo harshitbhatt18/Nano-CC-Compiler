@@ -3,6 +3,7 @@ translation_unit
     int
   block
     block_items
+<<<<<<< HEAD
       declaration
         int
       init_decl
@@ -15,5 +16,11 @@ translation_unit
       call(args)
         IDENTIFIER
       STRING_LITERAL
+=======
+      expr_stmt
+        call(args)
+          IDENTIFIER
+        STRING_LITERAL
+>>>>>>> 2cc9956d29f0e3962e23567a7ff2e21d8aed2e54
     return
       CONSTANT
