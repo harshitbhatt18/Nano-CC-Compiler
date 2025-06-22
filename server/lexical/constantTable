@@ -1,3 +1,6 @@
-VALUE    TYPE 
-1        INT 
-2        INT 
+Value                | Type       | Line Nos            
+0                    | INTEGER    | 9
+30                   | INTEGER    | 8
+20                   | INTEGER    | 7
+10                   | INTEGER    | 6
+"Hello, World!\n"    | STRING     | 4, 5

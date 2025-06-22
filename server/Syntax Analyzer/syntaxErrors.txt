@@ -1,6 +1,0 @@
-
-Syntax Errors
-
-../lexical/input.cc : 10 : Syntax Error
-Error near token: a
-Context: Expression or statement

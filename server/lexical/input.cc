@@ -1,16 +1,10 @@
-// Testcase to check  looping statements 
-#include<stdio.h>
-int main(){
+#include <stdio.h>
 
-	int l=10,a=0,i;
-	for(i=0;i<l;i++){
-		printf("\nHello World");
-	}
-	for(a<l;a++){
-		printf("\nInvalid Syntax");
-	}
-	while(i<10){
-		printf("\nCompiler Design");
-	}
-	
+int main() {
+    printf("Hello, World!\n");
+    printf("Hello, World!\n");
+    int a=10;
+    a=20;
+    a=30;
+    return 0;
 }

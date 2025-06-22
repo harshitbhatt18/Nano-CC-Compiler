@@ -1,3 +1,7 @@
-NAME    TYPE    SCOPE    VALUE 
-test    int     global   0 
-value   int     global   0 
+Identifier           | Line Nos                      
+a                    | 6, 7, 8
+printf               | 4, 5
+main                 | 3
+h                    | 1
+stdio                | 1
+include              | 1

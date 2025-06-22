@@ -1,0 +1,6 @@
+Identifier           | Line No   
+printf               | 4         
+main                 | 3         
+h                    | 1         
+stdio                | 1         
+include              | 1         
