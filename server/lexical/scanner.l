@@ -182,8 +182,58 @@ void write_constant_table() {
 
 [a-zA-Z_][a-zA-Z0-9_]* { insert_symbol(yytext); write_token(yytext, "IDENTIFIER", "VAR"); }
 
-"+"             { write_token(yytext, "OPERATOR", "ADD"); }
+"+"             { write_token(yytext, "OPERATOR", "ADD"); } /* Operators */
 "-"             { write_token(yytext, "OPERATOR", "SUB"); }
+"*"             { write_token(yytext, "OPERATOR", "MUL"); }
+"/"             { write_token(yytext, "OPERATOR", "DIV"); }
+"%"             { write_token(yytext, "OPERATOR", "MOD"); }
+"++"            { write_token(yytext, "OPERATOR", "INC"); }
+"--"            { write_token(yytext, "OPERATOR", "DEC"); }
+"="             { write_token(yytext, "OPERATOR", "ASSIGN"); }
+"+="            { write_token(yytext, "OPERATOR", "ADD_ASSIGN"); }
+"-="            { write_token(yytext, "OPERATOR", "SUB_ASSIGN"); }
+"*="            { write_token(yytext, "OPERATOR", "MUL_ASSIGN"); }
+"/="            { write_token(yytext, "OPERATOR", "DIV_ASSIGN"); }
+"%="            { write_token(yytext, "OPERATOR", "MOD_ASSIGN"); }
+"=="            { write_token(yytext, "OPERATOR", "EQ"); }
+"!="            { write_token(yytext, "OPERATOR", "NEQ"); }
+"<"             { write_token(yytext, "OPERATOR", "LT"); }
+">"             { write_token(yytext, "OPERATOR", "GT"); }
+"<="            { write_token(yytext, "OPERATOR", "LTE"); }
+">="            { write_token(yytext, "OPERATOR", "GTE"); }
+"&&"            { write_token(yytext, "OPERATOR", "AND"); }
+"||"            { write_token(yytext, "OPERATOR", "OR"); }
+"!"             { write_token(yytext, "OPERATOR", "NOT"); }
+"&"             { write_token(yytext, "OPERATOR", "BIT_AND"); }
+"|"             { write_token(yytext, "OPERATOR", "BIT_OR"); }
+"^"             { write_token(yytext, "OPERATOR", "BIT_XOR"); }
+"~"             { write_token(yytext, "OPERATOR", "BIT_NOT"); }
+"<<"            { write_token(yytext, "OPERATOR", "SHIFT_LEFT"); }
+">>"            { write_token(yytext, "OPERATOR", "SHIFT_RIGHT"); }
+"->"            { write_token(yytext, "OPERATOR", "ARROW"); }
+"::"            { write_token(yytext, "OPERATOR", "SCOPE"); }
+
+
+"("             { write_token(yytext, "PUNCTUATION", "LPAREN"); } /* Punctuation */
+")"             { write_token(yytext, "PUNCTUATION", "RPAREN"); }
+"{"             { write_token(yytext, "PUNCTUATION", "LBRACE"); }
+"}"             { write_token(yytext, "PUNCTUATION", "RBRACE"); }
+"["             { write_token(yytext, "PUNCTUATION", "LBRACKET"); }
+"]"             { write_token(yytext, "PUNCTUATION", "RBRACKET"); }
+";"             { write_token(yytext, "PUNCTUATION", "SEMICOLON"); }
+","             { write_token(yytext, "PUNCTUATION", "COMMA"); }
+"."             { write_token(yytext, "PUNCTUATION", "DOT"); }
+":"             { write_token(yytext, "PUNCTUATION", "COLON"); }
+"?"             { write_token(yytext, "PUNCTUATION", "QUESTION"); }
+
+"#include"      { write_token(yytext, "PREPROCESSOR", "INCLUDE"); } /* Preprocessor Directives */
+"#define"       { write_token(yytext, "PREPROCESSOR", "DEFINE"); }
+"#ifdef"        { write_token(yytext, "PREPROCESSOR", "IFDEF"); }
+"#ifndef"       { write_token(yytext, "PREPROCESSOR", "IFNDEF"); }
+"#endif"        { write_token(yytext, "PREPROCESSOR", "ENDIF"); }
+"#if"           { write_token(yytext, "PREPROCESSOR", "IF"); }
+"#else"         { write_token(yytext, "PREPROCESSOR", "ELSE"); }
+"#elif"         { write_token(yytext, "PREPROCESSOR", "ELIF"); }
 
 .               { write_token(yytext, "ERROR", "INVALID"); }
 %%

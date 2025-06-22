@@ -10,21 +10,5 @@ translation_unit
         call(args)
           IDENTIFIER
         STRING_LITERAL
-    expr_stmt
-      call(args)
-        IDENTIFIER
-      STRING_LITERAL
-    declaration
-      int
-    init_decl
-      IDENTIFIER
-    expr_stmt
-      assign
-        IDENTIFIER
-      CONSTANT
-    expr_stmt
-      assign
-        IDENTIFIER
-      CONSTANT
     return
       CONSTANT

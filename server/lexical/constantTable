@@ -1,6 +1,3 @@
 Value                | Type       | Line Nos            
-0                    | INTEGER    | 9
-30                   | INTEGER    | 8
-20                   | INTEGER    | 7
-10                   | INTEGER    | 6
-"Hello, World!\n"    | STRING     | 4, 5
+0                    | INTEGER    | 5
+"Welcome to Nano CC Compiler" | STRING     | 4
