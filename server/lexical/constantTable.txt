@@ -1,3 +1,0 @@
-Value                | Type      
-0                    | INTEGER   
-"Hello, World!\n"    | STRING    

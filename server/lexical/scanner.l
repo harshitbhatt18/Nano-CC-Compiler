@@ -14,7 +14,7 @@ void write_token(const char* lexeme, const char* type, const char* attribute) {
             lexeme, type, attribute, line_no);
 }
 
-/* --- Symbol Table (Identifiers with multiple line numbers) --- */
+/* --- Symbol Table  --- */
 #define MAX_LINES 100
 
 typedef struct Symbol {

@@ -14,7 +14,7 @@ app.use(bodyParser.json());
 
 const activeProcesses = {};
 const processTimeouts = {};
-const terminationReasons = {}; // only needed for auto timeout now
+const terminationReasons = {}; 
 
 // === Compile Endpoint ===
 app.post('/api/compile', (req, res) => {
@@ -23,6 +23,7 @@ app.post('/api/compile', (req, res) => {
 
   const compilationId = uuidv4();
   const lexicalDir = path.join(__dirname, 'lexical');
+  const semanticDir = path.join(__dirname, 'semantic');
   const inputFilePath = path.join(lexicalDir, 'input.cc');
 
   if (!fs.existsSync(lexicalDir)) {
@@ -61,7 +62,7 @@ app.post('/api/compile', (req, res) => {
       terminationReasons[compilationId] = 'timeout';
       console.log(`⏱️ Auto-killed compilation ${compilationId} after timeout.`);
     }
-  }, 6000);
+  }, 10000);
   processTimeouts[compilationId] = timeout;
 
   // === On Compilation Exit ===
@@ -88,9 +89,9 @@ app.post('/api/compile', (req, res) => {
     };
 
     const parseTable = safeRead(path.join(lexicalDir, 'parseTable'));
-    const symbolTable = safeRead(path.join(lexicalDir, 'symbolTable'));
-    const constantTable = safeRead(path.join(lexicalDir, 'constantTable'));
-    const parseTreePath = path.join(__dirname, 'Syntax Analyzer', 'parsetree.txt');
+    const symbolTable = safeRead(path.join(semanticDir, 'symbolTable'));
+    const constantTable = safeRead(path.join(semanticDir, 'constantTable'));
+    const parseTreePath = path.join(__dirname, 'syntax', 'parsetree.txt');
     const parseTree = fs.existsSync(parseTreePath)
       ? safeRead(parseTreePath).replace(/\r\n/g, '\n')
       : '';
@@ -128,7 +129,7 @@ app.post('/api/input', (req, res) => {
 });
 
 // === Static parse tree image serving ===
-const syntaxAnalyzerDir = path.join(__dirname, 'Syntax Analyzer');
+const syntaxAnalyzerDir = path.join(__dirname, 'syntax');
 app.use('/api/parsetree-image', express.static(syntaxAnalyzerDir));
 
 // === Start server ===

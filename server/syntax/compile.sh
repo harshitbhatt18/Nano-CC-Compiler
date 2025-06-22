@@ -28,8 +28,6 @@ rm "$TEMP_FILE"
 
 if [ $CPP_HEADERS -eq 0 ] && grep -q "#include *<stdio.h>" "$INPUT_FILE"; then
     # echo "Detected C file. Using C compiler..."
-    
-    # C compilation commands 
     lex -w lexicalAnalyzer.l
     win_bison -t -d -v syntaxChecker.y
     gcc -w lex.yy.c syntaxChecker.tab.c
@@ -39,8 +37,6 @@ if [ $CPP_HEADERS -eq 0 ] && grep -q "#include *<stdio.h>" "$INPUT_FILE"; then
     dot -Tpng  parseTree.dot -o "parseTree.png" 
 else
     # echo "Detected C++ file. Using C++ compiler..."
-    
-    # C++ compilation commands 
     lex -w cpp_lexer.l
     win_bison -t -d -v cpp_parser.y
     gcc -w lex.yy.c cpp_parser.tab.c
@@ -50,4 +46,5 @@ else
     dot -Tpng  parseTree.dot -o "parseTree.png"
 fi
 echo -----------------------------------------------------------------------------------------
+cd ..
 

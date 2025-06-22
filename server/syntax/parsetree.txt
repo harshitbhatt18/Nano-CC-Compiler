@@ -1,0 +1,32 @@
+translation_unit
+  function_definition
+    int
+  func_decl
+    func_decl
+      IDENTIFIER
+  block
+    block_items
+      declaration
+        int
+      init_decl
+        IDENTIFIER
+    expr_stmt
+      assign
+        IDENTIFIER
+      CONSTANT
+    expr_stmt
+      call(args)
+        IDENTIFIER
+      STRING_LITERAL
+    return
+      CONSTANT
+function_definition
+  void
+func_decl
+  func_decl
+    IDENTIFIER
+block
+  declaration
+    int
+  init_decl
+    IDENTIFIER

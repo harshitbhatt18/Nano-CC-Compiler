@@ -27,8 +27,10 @@ if %ERRORLEVEL% EQU 0 (
 
     echo -----------------------------------------------------------------------------------------
     echo Running Syntax Analyzer with Bison...
-    copy /Y lexical\input.cc "Syntax Analyzer\input.cc" >nul
-    "C:\Program Files\Git\bin\sh.exe" "Syntax Analyzer/compile.sh"
+    "C:\Program Files\Git\bin\sh.exe" "syntax/compile.sh"
+    ::echo -----------------------------------------------------------------------------------------
+    echo Running Semantic Analyzer...
+    "C:\Program Files\Git\bin\sh.exe" "semantic/compile.sh"
     echo -----------------------------------------------------------------------------------------
 ) else (
     echo Lex and Bison not found.

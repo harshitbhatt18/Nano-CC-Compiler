@@ -20,6 +20,8 @@ const CompilerPage: React.FC = () => {
   const [formattedParseTable, setFormattedParseTable] = useState('');
   const [parseTree, setParseTree] = useState('');
   const [showParseTreeModal, setShowParseTreeModal] = useState(false);
+  const [formattedSymbolTable, setFormattedSymbolTable] = useState('');
+  const [formattedConstantTable, setFormattedConstantTable] = useState('');
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -70,6 +72,81 @@ const CompilerPage: React.FC = () => {
       setFormattedParseTable(`<pre>${parseTable}</pre>`);
     }
   }, [parseTable]);
+
+  useEffect(() => {
+    if (!symbolTable || symbolTable.startsWith('No symbol table')) {
+      setFormattedSymbolTable('No symbol table data available');
+      return;
+    }
+    try {
+      let result = '<style>\n';
+      result += '.semantic-table { width: 100%; border-collapse: collapse; font-family: sans-serif; }\n';
+      result += '.semantic-table th { padding: 8px; text-align: left; background-color: #2d2d2d; color:  #bb86fc; }\n';
+      result += '.semantic-table tr:nth-child(odd) td { background-color: #242424; }\n';
+      result += '.semantic-table tr:nth-child(even) td { background-color: #1e1e1e; }\n';
+      result += '.semantic-table td { padding: 8px; vertical-align: top; }\n';
+      result += '</style>\n';
+      result += '<table class="semantic-table">\n';
+      result += '  <thead>\n    <tr>\n';
+      result += '      <th>Lexeme</th>\n      <th>Type</th>\n      <th>Line No</th>\n      <th>Scope</th>\n      <th>Func No</th>\n';
+      result += '    </tr>\n  </thead>\n<tbody>\n';
+      const lines = symbolTable.split('\n').filter(line => line.trim() && !line.startsWith('Lexeme'));
+      lines.forEach(line => {
+        const parts = line.split(' | ');
+        if (parts.length >= 5) {
+          const [lexeme, type, lineNo, scope, funcNo] = parts.map(p => p.trim());
+          const formattedLineNo = lineNo.split(/\s+/).join(', ');
+          result += '    <tr>\n';
+          result += `      <td>${escapeHtml(lexeme)}</td>\n`;
+          result += `      <td>${escapeHtml(type)}</td>\n`;
+          result += `      <td>${escapeHtml(formattedLineNo)}</td>\n`;
+          result += `      <td>${escapeHtml(scope)}</td>\n`;
+          result += `      <td>${escapeHtml(funcNo)}</td>\n`;
+          result += '    </tr>\n';
+        }
+      });
+      result += '</tbody>\n</table>';
+      setFormattedSymbolTable(result);
+    } catch (error) {
+      setFormattedSymbolTable(`<pre>${symbolTable}</pre>`);
+    }
+  }, [symbolTable]);
+
+  useEffect(() => {
+    if (!constantTable || constantTable.startsWith('No constant table')) {
+      setFormattedConstantTable('No constant table data available');
+      return;
+    }
+    try {
+      let result = '<style>\n';
+      result += '.semantic-table { width: 100%; border-collapse: collapse; font-family: sans-serif; }\n';
+      result += '.semantic-table th { padding: 8px; text-align: left; background-color: #2d2d2d; color:  #bb86fc; }\n';
+      result += '.semantic-table tr:nth-child(odd) td { background-color: #242424; }\n';
+      result += '.semantic-table tr:nth-child(even) td { background-color: #1e1e1e; }\n';
+      result += '.semantic-table td { padding: 8px; vertical-align: top; }\n';
+      result += '</style>\n';
+      result += '<table class="semantic-table">\n';
+      result += '  <thead>\n    <tr>\n';
+      result += '      <th>Value</th>\n      <th>Line No</th>\n';
+      result += '    </tr>\n  </thead>\n<tbody>\n';
+      const lines = constantTable.split('\n').filter(line => line.trim() && !line.startsWith('Value'));
+      lines.forEach(line => {
+        const parts = line.split(' | ');
+        if (parts.length >= 2) {
+          const [value, lineNo] = parts.map(p => p.trim());
+          const formattedLineNo = lineNo.split(/\s+/).join(', ');
+          result += '    <tr>\n';
+          result += `      <td>${escapeHtml(value)}</td>\n`;
+          result += `      <td>${escapeHtml(formattedLineNo)}</td>\n`;
+          result += '    </tr>\n';
+        }
+      });
+      result += '</tbody>\n</table>';
+      setFormattedConstantTable(result);
+    } catch (error) {
+      setFormattedConstantTable(`<pre>${constantTable}</pre>`);
+    }
+  }, [constantTable]);
 
   const escapeHtml = (unsafe: string) => {
     return unsafe
@@ -207,11 +284,11 @@ const CompilerPage: React.FC = () => {
             </TabPanel>
 
             <TabPanel value={tabValue} index={2}>
-              <Box component="pre" sx={{ p: 2, overflow: 'auto', height: 'calc(100vh - 180px)', bgcolor: '#1e1e1e', color: '#e0e0e0' }}>
+              <Box sx={{ p: 2, overflow: 'auto', height: 'calc(100vh - 180px)', bgcolor: '#1e1e1e', color: '#e0e0e0' }}>
                 <Typography variant="h6" sx={{ color: '#bb86fc' }}>Symbol Table:</Typography>
-                {symbolTable}
+                <Box dangerouslySetInnerHTML={{ __html: formattedSymbolTable }} />
                 <Typography variant="h6" sx={{ mt: 2, color: '#bb86fc' }}>Constant Table:</Typography>
-                {constantTable}
+                <Box dangerouslySetInnerHTML={{ __html: formattedConstantTable }} />
               </Box>
             </TabPanel>
           </Paper>
