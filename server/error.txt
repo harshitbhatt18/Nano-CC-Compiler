@@ -1,4 +1,0 @@
-lexical\input.cc: In function 'int main()':
-lexical\input.cc:5:5: error: expected ';' before 'return'
-     return 0;
-     ^~~~~~

@@ -53,6 +53,6 @@ if %COMPILE_ERROR% EQU 0 (
     output.exe
 ) else (
     echo Compilation failed!
-    @REM type error.txt
-    @REM del error.txt
+    :: type error.txt
+    del error.txt
 )

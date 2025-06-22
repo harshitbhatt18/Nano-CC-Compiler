@@ -469,6 +469,7 @@ void yyerror(const char *msg)
 	printf("\n%s : %d :Syntax error \n", sourceCode, lineCount);
 }
 
+
 int main(int argc, char **argv) {
 	if (argc <= 1) {
 		printf("Invalid, Expected Format : ./a.out <\"sourceCode\"> \n");
@@ -531,7 +532,7 @@ int main(int argc, char **argv) {
 		fprintf(writeConstant, "%-16s | %-8s\n", "Value", "Line No");
 
 		for (tokenList *ptr = constantPtr; ptr != NULL; ptr = ptr->next) {
-			fprintf(writeConstant, "%-16s | %-8s\n", ptr->token, ptr->line);
+			fprintf(writeConstant, "%-16s | %-8s\n", ptr->token,ptr->line);
 		}
 		fclose(writeConstant);
 	}

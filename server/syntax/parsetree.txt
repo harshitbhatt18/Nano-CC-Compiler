@@ -1,0 +1,19 @@
+translation_unit
+  function_definition
+    int
+  block
+    block_items
+      declaration
+        int
+      init_decl
+        IDENTIFIER
+    declaration
+      float
+    init_decl
+      IDENTIFIER
+    expr_stmt
+      call(args)
+        IDENTIFIER
+      STRING_LITERAL
+    return
+      CONSTANT
