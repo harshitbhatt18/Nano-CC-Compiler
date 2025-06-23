@@ -1,4 +1,4 @@
 Lexeme           | Type         | Line No  | Scope    | Func No 
 main             | INT          |  3       | GLOBAL   | 1       
-a                | INT          |  4       | NESTING  | 1       
-b                | FLOAT        |  5       | NESTING  | 1       
+b                | INT          |  4       | NESTING  | 1       
+cc               | INT          |  5       | NESTING  | 1       

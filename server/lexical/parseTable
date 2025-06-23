@@ -9,25 +9,13 @@ main                 | IDENTIFIER      | VAR             | 3
 (                    | PUNCTUATION     | LPAREN          | 3       
 )                    | PUNCTUATION     | RPAREN          | 3       
 {                    | PUNCTUATION     | LBRACE          | 3       
-<<<<<<< HEAD
 int                  | KEYWORD         | INT             | 4       
-a                    | IDENTIFIER      | VAR             | 4       
+b                    | IDENTIFIER      | VAR             | 4       
 =                    | OPERATOR        | ASSIGN          | 4       
 10                   | NUMBER          | INTEGER         | 4       
 ;                    | PUNCTUATION     | SEMICOLON       | 4       
-float                | KEYWORD         | FLOAT           | 5       
-b                    | IDENTIFIER      | VAR             | 5       
-=                    | OPERATOR        | ASSIGN          | 5       
-2.5                  | NUMBER          | FLOAT           | 5       
-=======
-printf               | IDENTIFIER      | VAR             | 4       
-(                    | PUNCTUATION     | LPAREN          | 4       
-"Welcome to Nano CC Compiler" | STRING          | LITERAL         | 4       
-)                    | PUNCTUATION     | RPAREN          | 4       
-;                    | PUNCTUATION     | SEMICOLON       | 4       
-return               | KEYWORD         | RETURN          | 5       
-0                    | NUMBER          | INTEGER         | 5       
->>>>>>> 2cc9956d29f0e3962e23567a7ff2e21d8aed2e54
+int                  | KEYWORD         | INT             | 5       
+cc                   | IDENTIFIER      | VAR             | 5       
 ;                    | PUNCTUATION     | SEMICOLON       | 5       
 printf               | IDENTIFIER      | VAR             | 6       
 (                    | PUNCTUATION     | LPAREN          | 6       

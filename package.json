@@ -1,7 +1,7 @@
 {
   "name": "nano-cc-compiler",
   "version": "1.0.0",
-  "description": "A C/C++ compiler with lexical analysis for educational purposes",
+  "description": "A Windows-based C/C++ compiler with lexical analysis for educational purposes",
   "main": "index.js",
   "scripts": {
     "server": "cd server && npm run dev",
@@ -27,5 +27,9 @@
   },
   "dependencies": {
     "uuid": "^11.1.0"
+  },
+  "engines": {
+    "node": ">=14.0.0",
+    "os": "win32"
   }
 }

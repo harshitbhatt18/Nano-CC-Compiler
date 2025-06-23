@@ -6,6 +6,13 @@ const path = require('path');
 const { spawn } = require('child_process');
 const { v4: uuidv4 } = require('uuid');
 
+// Check if running on Windows
+if (process.platform !== 'win32') {
+  console.error('❌ This application is designed to run only on Windows.');
+  console.error('   The compiler uses Windows-specific tools and batch scripts.');
+  process.exit(1);
+}
+
 const app = express();
 const PORT = process.env.PORT || 5000;
 
@@ -32,12 +39,12 @@ app.post('/api/compile', (req, res) => {
 
   fs.writeFileSync(inputFilePath, code);
 
-  const isWindows = process.platform === 'win32';
-  const command = isWindows ? 'compiler.bat' : './compiler.sh';
+  // Windows-only compilation
+  const command = 'compiler.bat';
 
   const compileProcess = spawn(
-    isWindows ? 'cmd.exe' : 'sh',
-    isWindows ? ['/c', command] : [command],
+    'cmd.exe',
+    ['/c', command],
     { cwd: __dirname, shell: true }
   );
 
@@ -134,5 +141,5 @@ app.use('/api/parsetree-image', express.static(syntaxAnalyzerDir));
 
 // === Start server ===
 app.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`);
+  console.log(`🚀 Windows-based Nano CC Compiler server running on port ${PORT}`);
 });

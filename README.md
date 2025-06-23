@@ -9,7 +9,7 @@ A C/C++ compiler with lexical analysis built for educational purposes, demonstra
 - Lexical analysis with token generation
 - Syntax analysis with parse table generation
 - Interactive terminal for program I/O
-- Support for both Windows and Linux/Mac environments
+- Windows-only environment support
 
 ## Project Structure
 
@@ -34,12 +34,14 @@ nano-cc-compiler/
 
 ### Prerequisites
 
+- Windows operating system
 - Node.js (v14 or higher)
 - npm (v6 or higher)
 - GCC compiler (for actually compiling C/C++ code)
 - lex (for lexical analysis)
 - win_bison (for syntax and semantic analysis)
 - Graphviz (for creating graphs)
+- Git Bash (for running shell scripts)
 
 ### Installation
 
@@ -59,16 +61,18 @@ nano-cc-compiler/
    ```
    npm run dev
    ```
-   Or simply double-click the `start.bat` file if you're on Windows.
+   Or simply double-click the `start.bat` file.
 
 4. Open your browser and navigate to `http://localhost:3000`
 
-### Windows Compatibility Note
+### Windows Setup Requirements
 
 For Windows users:
 - The application uses a .bat file for running the compiler process
-- If you encounter issues, make sure you have GCC installed and added to your PATH
-- If you encounter an issue, make sure you have renamed your 'win_flex.exe' to 'lex.exe'. 
+- Make sure you have GCC installed and added to your PATH
+- Make sure you have renamed your 'win_flex.exe' to 'lex.exe'
+- Ensure Git Bash is installed (usually comes with Git for Windows)
+- Install win_bison for Windows (not the Unix version)
 
 ## How It Works
 

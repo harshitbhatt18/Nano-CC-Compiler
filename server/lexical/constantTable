@@ -1,5 +1,4 @@
 Value                | Type       | Line Nos            
 0                    | INTEGER    | 7
 "Welcome to Nano CC Compiler" | STRING     | 6
-2.5                  | FLOAT      | 5
 10                   | INTEGER    | 4

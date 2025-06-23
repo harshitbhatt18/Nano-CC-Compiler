@@ -37,7 +37,7 @@ if %ERRORLEVEL% EQU 0 (
 )
 
 :: -----------------------------------------------------------------------------------------
-:: PRE-COMPILATION: Force kill and delete previous output.exe if it exists or is locked
+:: Force kill and delete previous output.exe 
 taskkill /f /im output.exe >nul 2>&1
 del /f /q output.exe >nul 2>&1
 

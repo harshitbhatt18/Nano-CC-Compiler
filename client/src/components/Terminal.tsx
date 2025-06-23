@@ -102,7 +102,7 @@ const Terminal: React.FC<TerminalProps> = ({ output, onSendInput, height = '100%
             <Box 
               key={index}
               sx={{ 
-                width: 6, // Reduced from 8 to 6
+                width: 6, 
                 height: 6,
                 borderRadius: '50%',
                 bgcolor: color,
@@ -155,7 +155,7 @@ const Terminal: React.FC<TerminalProps> = ({ output, onSendInput, height = '100%
         )}
       </Box>
       
-      {/* Terminal Input - Reduced padding */}
+      {/* Terminal Input  */}
       <Box 
         sx={{ 
           p: 1.5, // Reduced from 2 to 1.5
@@ -175,7 +175,7 @@ const Terminal: React.FC<TerminalProps> = ({ output, onSendInput, height = '100%
             '& .MuiOutlinedInput-root': {
               backgroundColor: 'rgba(15, 15, 35, 0.8)',
               fontFamily: '"JetBrains Mono", "Fira Code", monospace',
-              fontSize: '13px', // Smaller font
+              fontSize: '13px',
               color: '#f1f5f9',
               borderRadius: '8px',
               border: '1px solid rgba(124, 58, 237, 0.3)',
@@ -193,7 +193,7 @@ const Terminal: React.FC<TerminalProps> = ({ output, onSendInput, height = '100%
               }
             },
             '& .MuiOutlinedInput-input': {
-              padding: '8px 12px', // Reduced padding
+              padding: '8px 12px', 
               '&::placeholder': {
                 color: '#64748b',
                 opacity: 1,
