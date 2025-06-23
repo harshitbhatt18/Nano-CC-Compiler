@@ -1,10 +1,10 @@
 Lexeme           | Type         | Line No 
-int              | Keyword      |  3 4 5  
-(                | Punctuator   |  3 6    
-)                | Punctuator   |  3 6    
+int              | Keyword      |  3 4    
+(                | Punctuator   |  3 5    
+)                | Punctuator   |  3 5    
 {                | Punctuator   |  3      
 =                | Operator     |  4      
-;                | Punctuator   |  4 5 6 7
-"Welcome to Nano CC Compiler" | String Literal |  6      
-return           | Keyword      |  7      
-}                | Punctuator   |  8      
+;                | Punctuator   |  4 5 6  
+"Welcome to Nano CC Compiler" | String Literal |  5      
+return           | Keyword      |  6      
+}                | Punctuator   |  7      

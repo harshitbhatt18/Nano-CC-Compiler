@@ -1,6 +1,5 @@
 Identifier           | Line Nos                      
-printf               | 6
-cc                   | 5
+printf               | 5
 b                    | 4
 main                 | 3
 h                    | 1

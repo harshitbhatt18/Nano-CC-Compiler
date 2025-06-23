@@ -8,7 +8,7 @@
     "client": "cd client && npm start",
     "dev": "concurrently \"npm run server\" \"npm run client\"",
     "install:all": "npm install && cd client && npm install && cd ../server && npm install",
-    "clean": "rimraf server/lexical/.exe server/lexical/.c server/lexical/parseTable.txt server/error.txt server/output.exe",
+    "clean": "rimraf server/lexical/*.exe server/lexical/*.c server/lexical/parseTable server/lexical/symbolTable server/lexical/constantTable server/syntax/*.exe server/syntax/*.txt server/syntax/*.dot server/syntax/*.png server/syntax/*.output server/semantic/*.exe server/semantic/symbolTable server/semantic/constantTable server/semantic/parsedTable server/error.txt server/output.exe",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [

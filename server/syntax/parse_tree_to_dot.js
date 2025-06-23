@@ -4,8 +4,37 @@ const fs = require('fs');
 const path = require('path');
 
 function parseTreeToDot(inputFile, outputFile) {
+    // Check if input file exists
+    if (!fs.existsSync(inputFile)) {
+        // console.log(`Warning: Input file '${inputFile}' not found. Creating empty parse tree.`);
+        const emptyDotContent = [
+            'digraph ParseTree {',
+            'node [shape=box, fontname="Arial"];',
+            'edge [fontname="Arial"];',
+            '  error [label="No parse tree available\\n(Syntax analysis failed or no valid code)"];',
+            '}'
+        ];
+        fs.writeFileSync(outputFile, emptyDotContent.join('\n'));
+        return;
+    }
+
     // Read the input file
     const lines = fs.readFileSync(inputFile, 'utf8').split('\n');
+    
+    // Check if file is empty or has no meaningful content
+    const meaningfulLines = lines.filter(line => line.trim().length > 0);
+    if (meaningfulLines.length === 0) {
+        console.log(`Warning: Input file '${inputFile}' is empty. Creating empty parse tree.`);
+        const emptyDotContent = [
+            'digraph ParseTree {',
+            'node [shape=box, fontname="Arial"];',
+            'edge [fontname="Arial"];',
+            '  error [label="No parse tree available\\n(Empty or invalid input)"];',
+            '}'
+        ];
+        fs.writeFileSync(outputFile, emptyDotContent.join('\n'));
+        return;
+    }
     
     // Initialize DOT file
     const dotContent = [

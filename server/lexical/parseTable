@@ -14,15 +14,12 @@ b                    | IDENTIFIER      | VAR             | 4
 =                    | OPERATOR        | ASSIGN          | 4       
 10                   | NUMBER          | INTEGER         | 4       
 ;                    | PUNCTUATION     | SEMICOLON       | 4       
-int                  | KEYWORD         | INT             | 5       
-cc                   | IDENTIFIER      | VAR             | 5       
+printf               | IDENTIFIER      | VAR             | 5       
+(                    | PUNCTUATION     | LPAREN          | 5       
+"Welcome to Nano CC Compiler" | STRING          | LITERAL         | 5       
+)                    | PUNCTUATION     | RPAREN          | 5       
 ;                    | PUNCTUATION     | SEMICOLON       | 5       
-printf               | IDENTIFIER      | VAR             | 6       
-(                    | PUNCTUATION     | LPAREN          | 6       
-"Welcome to Nano CC Compiler" | STRING          | LITERAL         | 6       
-)                    | PUNCTUATION     | RPAREN          | 6       
+return               | KEYWORD         | RETURN          | 6       
+0                    | NUMBER          | INTEGER         | 6       
 ;                    | PUNCTUATION     | SEMICOLON       | 6       
-return               | KEYWORD         | RETURN          | 7       
-0                    | NUMBER          | INTEGER         | 7       
-;                    | PUNCTUATION     | SEMICOLON       | 7       
-}                    | PUNCTUATION     | RBRACE          | 8       
+}                    | PUNCTUATION     | RBRACE          | 7       

@@ -7,9 +7,6 @@ translation_unit
         int
       init_decl
         IDENTIFIER
-    declaration
-      int
-    IDENTIFIER
     expr_stmt
       call(args)
         IDENTIFIER

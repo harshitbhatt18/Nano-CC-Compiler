@@ -5,6 +5,10 @@ cd "$(dirname "$0")"
 
 INPUT_FILE="../lexical/input.cc"
 
+# Clean up previous output files
+rm -f parsetree.txt parsetree.dot parseTree.png syntaxErrors.txt
+rm -f *.output *.tab.c *.tab.h lex.yy.c
+rm -f a.exe input.exe
 
 # Check if the input file exists
 if [ ! -f "$INPUT_FILE" ]; then
@@ -33,8 +37,19 @@ if [ $CPP_HEADERS -eq 0 ] && grep -q "#include *<stdio.h>" "$INPUT_FILE"; then
     gcc -w lex.yy.c syntaxChecker.tab.c
     ./a.exe "$INPUT_FILE"
     rm -f syntaxChecker.tab.c syntaxChecker.tab.h lex.yy.c
-    node parse_tree_to_dot.js
-    dot -Tpng  parseTree.dot -o "parseTree.png" 
+    # Generate parse tree visualization (with error handling)
+    if [ -f "parsetree.txt" ]; then
+        node parse_tree_to_dot.js
+        if [ -f "parsetree.dot" ]; then
+            dot -Tpng parsetree.dot -o "parseTree.png" 2>/dev/null || echo "Warning: Could not generate parse tree image"
+        fi
+    else
+        echo "Warning: No parse tree generated. Creating empty visualization."
+        node parse_tree_to_dot.js
+        if [ -f "parsetree.dot" ]; then
+            dot -Tpng parsetree.dot -o "parseTree.png" 2>/dev/null || echo "Warning: Could not generate parse tree image"
+        fi
+    fi
 else
     # echo "Detected C++ file. Using C++ compiler..."
     lex -w cpp_lexer.l
@@ -42,8 +57,19 @@ else
     gcc -w lex.yy.c cpp_parser.tab.c
     ./a.exe "$INPUT_FILE"
     rm -f cpp_parser.tab.c cpp_parser.tab.h lex.yy.c
-    node parse_tree_to_dot.js
-    dot -Tpng  parseTree.dot -o "parseTree.png"
+    # Generate parse tree visualization (with error handling)
+    if [ -f "parsetree.txt" ]; then
+        node parse_tree_to_dot.js
+        if [ -f "parsetree.dot" ]; then
+            dot -Tpng parsetree.dot -o "parseTree.png" 2>/dev/null || echo "Warning: Could not generate parse tree image"
+        fi
+    else
+        echo "Warning: No parse tree generated."
+        node parse_tree_to_dot.js
+        if [ -f "parsetree.dot" ]; then
+            dot -Tpng parsetree.dot -o "parseTree.png" 2>/dev/null || echo "Warning: Could not generate parse tree image"
+        fi
+    fi
 fi
 echo -----------------------------------------------------------------------------------------
 cd ..
