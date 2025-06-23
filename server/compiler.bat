@@ -26,24 +26,17 @@ if %ERRORLEVEL% EQU 0 (
         echo Lexical analysis completed.
         cd ..
         
-        :: Ensure output files exist (create empty ones if they don't)
+        :: Ensure output files exist 
         if not exist %LEXICAL_DIR%\parseTable (
             echo No tokens found > %LEXICAL_DIR%\parseTable
         )
-        if not exist %LEXICAL_DIR%\symbolTable (
-            echo No symbols found > %LEXICAL_DIR%\symbolTable
-        )
-        if not exist %LEXICAL_DIR%\constantTable (
-            echo No constants found > %LEXICAL_DIR%\constantTable
-        )
+       
     ) else (
         echo Failed to compile the scanner.
         cd ..
         
         :: Create empty output files when scanner fails
         echo No tokens found > %LEXICAL_DIR%\parseTable
-        echo No symbols found > %LEXICAL_DIR%\symbolTable
-        echo No constants found > %LEXICAL_DIR%\constantTable
     )
 
     echo -----------------------------------------------------------------------------------------
