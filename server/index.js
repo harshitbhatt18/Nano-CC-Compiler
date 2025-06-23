@@ -36,6 +36,10 @@ app.post('/api/compile', (req, res) => {
     fs.mkdirSync(lexicalDir, { recursive: true });
   }
 
+  if (!fs.existsSync(semanticDir)) {
+    fs.mkdirSync(semanticDir, { recursive: true });
+  }
+
   fs.writeFileSync(inputFilePath, code);
 
   // Windows-only compilation
@@ -113,6 +117,7 @@ app.post('/api/compile', (req, res) => {
     });
   });
 
+  // To check issue with spawn
   compileProcess.on('error', err => {
     if (responded) return;
 
@@ -140,5 +145,5 @@ app.use('/api/parsetree-image', express.static(syntaxAnalyzerDir));
 
 // === Start server ===
 app.listen(PORT, () => {
-  console.log(`🚀 Nano CC Compiler server running on port ${PORT}`);
+  console.log(`Nano CC Compiler server running on port ${PORT}`);
 });
