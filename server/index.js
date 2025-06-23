@@ -9,7 +9,6 @@ const { v4: uuidv4 } = require('uuid');
 // Check if running on Windows
 if (process.platform !== 'win32') {
   console.error('❌ This application is designed to run only on Windows.');
-  console.error('   The compiler uses Windows-specific tools and batch scripts.');
   process.exit(1);
 }
 
@@ -72,7 +71,7 @@ app.post('/api/compile', (req, res) => {
   }, 10000);
   processTimeouts[compilationId] = timeout;
 
-  // === On Compilation Exit ===
+  // === On Successful Compilation ===
   compileProcess.on('exit', () => {
     if (responded) return;
 
@@ -141,5 +140,5 @@ app.use('/api/parsetree-image', express.static(syntaxAnalyzerDir));
 
 // === Start server ===
 app.listen(PORT, () => {
-  console.log(`🚀 Windows-based Nano CC Compiler server running on port ${PORT}`);
+  console.log(`🚀 Nano CC Compiler server running on port ${PORT}`);
 });
